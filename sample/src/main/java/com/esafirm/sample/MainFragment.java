@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.esafirm.imagepicker.features.ImagePicker;
+import com.esafirm.imagepicker.features.imagepicker.ImagePicker;
 import com.esafirm.imagepicker.model.Image;
 
 import java.util.List;
@@ -37,10 +37,6 @@ public class MainFragment extends Fragment {
                     public void onClick(View view) {
                         ImagePicker.create(MainFragment.this)
                                 .returnAfterFirst(true) // set whether pick action or camera action should return immediate result or not. Only works in single mode for image picker
-                                .folderMode(true) // set folder mode (false by default)
-                                .single()
-                                .folderTitle("Folder") // folder selection title
-                                .imageTitle("Tap to select")
                                 .start(0); // image selection title
                     }
                 });

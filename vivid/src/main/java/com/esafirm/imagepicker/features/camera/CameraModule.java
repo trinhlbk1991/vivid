@@ -3,7 +3,7 @@ package com.esafirm.imagepicker.features.camera;
 import android.content.Context;
 import android.content.Intent;
 
-import com.esafirm.imagepicker.features.ImagePickerConfig;
+import com.esafirm.imagepicker.features.imagepicker.ImagePickerConfig;
 
 public interface CameraModule {
     Intent getCameraIntent(Context context, ImagePickerConfig config);

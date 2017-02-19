@@ -1,4 +1,4 @@
-package com.esafirm.imagepicker.features;
+package com.esafirm.imagepicker.features.imagepicker;
 
 import android.content.Context;
 import android.os.Parcel;
@@ -20,18 +20,16 @@ public class ImagePickerConfig implements Parcelable {
     private int mode;
     private int limit;
 
-    private boolean folderMode;
     private boolean showCamera;
     private boolean returnAfterFirst;
 
     public ImagePickerConfig(Context context) {
-        this.mode = ImagePicker.MODE_MULTIPLE;
+        this.mode = ImagePicker.MULTIPLE;
         this.limit = ImagePicker.MAX_LIMIT;
         this.showCamera = true;
         this.folderTitle = context.getString(R.string.ef_title_folder);
         this.imageTitle = context.getString(R.string.ef_title_select_image);
         this.selectedImages = new ArrayList<>();
-        this.folderMode = false;
         this.imageDirectory = context.getString(R.string.ef_image_directory);
         this.returnAfterFirst = true;
     }
@@ -92,14 +90,6 @@ public class ImagePickerConfig implements Parcelable {
         this.selectedImages = selectedImages;
     }
 
-    public boolean isFolderMode() {
-        return folderMode;
-    }
-
-    public void setFolderMode(boolean folderMode) {
-        this.folderMode = folderMode;
-    }
-
     public String getImageDirectory() {
         return imageDirectory;
     }
@@ -125,7 +115,6 @@ public class ImagePickerConfig implements Parcelable {
         dest.writeString(this.imageDirectory);
         dest.writeInt(this.mode);
         dest.writeInt(this.limit);
-        dest.writeByte(this.folderMode ? (byte) 1 : (byte) 0);
         dest.writeByte(this.showCamera ? (byte) 1 : (byte) 0);
         dest.writeByte(this.returnAfterFirst ? (byte) 1 : (byte) 0);
     }
@@ -137,7 +126,6 @@ public class ImagePickerConfig implements Parcelable {
         this.imageDirectory = in.readString();
         this.mode = in.readInt();
         this.limit = in.readInt();
-        this.folderMode = in.readByte() != 0;
         this.showCamera = in.readByte() != 0;
         this.returnAfterFirst = in.readByte() != 0;
     }

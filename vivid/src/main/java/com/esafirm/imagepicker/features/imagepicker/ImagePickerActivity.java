@@ -1,4 +1,4 @@
-package com.esafirm.imagepicker.features;
+package com.esafirm.imagepicker.features.imagepicker;
 
 import android.Manifest;
 import android.content.Intent;
@@ -31,6 +31,7 @@ import android.widget.Toast;
 import com.esafirm.imagepicker.R;
 import com.esafirm.imagepicker.adapter.FolderPickerAdapter;
 import com.esafirm.imagepicker.adapter.ImagePickerAdapter;
+import com.esafirm.imagepicker.features.ImageLoader;
 import com.esafirm.imagepicker.features.camera.CameraHelper;
 import com.esafirm.imagepicker.helper.ImagePickerPreferences;
 import com.esafirm.imagepicker.helper.IntentHelper;
@@ -44,9 +45,9 @@ import com.esafirm.imagepicker.view.ProgressWheel;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.esafirm.imagepicker.features.ImagePicker.EXTRA_SELECTED_IMAGES;
-import static com.esafirm.imagepicker.features.ImagePicker.MODE_MULTIPLE;
-import static com.esafirm.imagepicker.features.ImagePicker.MODE_SINGLE;
+import static com.esafirm.imagepicker.features.imagepicker.ImagePicker.EXTRA_SELECTED_IMAGES;
+import static com.esafirm.imagepicker.features.imagepicker.ImagePicker.MULTIPLE;
+import static com.esafirm.imagepicker.features.imagepicker.ImagePicker.SINGLE;
 import static com.esafirm.imagepicker.helper.ImagePickerPreferences.PREF_WRITE_EXTERNAL_STORAGE_REQUESTED;
 
 public class ImagePickerActivity extends AppCompatActivity
@@ -114,7 +115,7 @@ public class ImagePickerActivity extends AppCompatActivity
         actionBar = getSupportActionBar();
 
         if (actionBar != null) {
-            actionBar.setTitle(config.isFolderMode() ? config.getFolderTitle() : config.getImageTitle());
+            actionBar.setTitle(config.getFolderTitle());
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back);
             actionBar.setDisplayShowTitleEnabled(true);
@@ -131,7 +132,7 @@ public class ImagePickerActivity extends AppCompatActivity
         }
 
         ArrayList<Image> selectedImages = null;
-        if (config.getMode() == MODE_MULTIPLE && !config.getSelectedImages().isEmpty()) {
+        if (config.getMode() == MULTIPLE && !config.getSelectedImages().isEmpty()) {
             selectedImages = config.getSelectedImages();
         }
         if (selectedImages == null) {
@@ -208,7 +209,7 @@ public class ImagePickerActivity extends AppCompatActivity
         if (menuDone != null) {
             menuDone.setVisible(!isDisplayingFolderView() && !imageAdapter.getSelectedImages().isEmpty());
 
-            if (config.getMode() == MODE_SINGLE && config.isReturnAfterFirst()) {
+            if (config.getMode() == SINGLE && config.isReturnAfterFirst()) {
                 menuDone.setVisible(false);
             }
         }
@@ -295,7 +296,7 @@ public class ImagePickerActivity extends AppCompatActivity
 
     private void getData() {
         presenter.abortLoad();
-        presenter.loadImages(config.isFolderMode());
+        presenter.loadImages(true);
     }
 
     /**
@@ -414,7 +415,7 @@ public class ImagePickerActivity extends AppCompatActivity
     private void clickImage(int position) {
         Image image = imageAdapter.getItem(position);
         int selectedItemPosition = selectedImagePosition(image);
-        if (config.getMode() == ImagePicker.MODE_MULTIPLE) {
+        if (config.getMode() == ImagePicker.MULTIPLE) {
             if (selectedItemPosition == -1) {
                 if (imageAdapter.getSelectedImages().size() < config.getLimit()) {
                     imageAdapter.addSelected(image);
@@ -523,7 +524,7 @@ public class ImagePickerActivity extends AppCompatActivity
 
         if (imageAdapter.getSelectedImages().isEmpty()) {
             actionBar.setTitle(config.getImageTitle());
-        } else if (config.getMode() == ImagePicker.MODE_MULTIPLE) {
+        } else if (config.getMode() == ImagePicker.MULTIPLE) {
             int imageSize = imageAdapter.getSelectedImages().size();
             actionBar.setTitle(config.getLimit() == ImagePicker.MAX_LIMIT
                     ? String.format(getString(R.string.ef_selected), imageSize)
@@ -554,8 +555,7 @@ public class ImagePickerActivity extends AppCompatActivity
      * Check if displaying folders view
      */
     private boolean isDisplayingFolderView() {
-        return (config.isFolderMode() &&
-                (recyclerView.getAdapter() == null || recyclerView.getAdapter() instanceof FolderPickerAdapter));
+        return ((recyclerView.getAdapter() == null || recyclerView.getAdapter() instanceof FolderPickerAdapter));
     }
 
     /**
@@ -563,17 +563,13 @@ public class ImagePickerActivity extends AppCompatActivity
      */
     @Override
     public void onBackPressed() {
-        if (config.isFolderMode() && !isDisplayingFolderView()) {
+        if (!isDisplayingFolderView()) {
             setFolderAdapter(null);
             return;
         }
         setResult(RESULT_CANCELED);
         super.onBackPressed();
     }
-
-    /* --------------------------------------------------- */
-    /* > View Methods */
-    /* --------------------------------------------------- */
 
     @Override
     public void finishPickImages(List<Image> images) {
@@ -591,11 +587,7 @@ public class ImagePickerActivity extends AppCompatActivity
 
     @Override
     public void showFetchCompleted(List<Image> images, List<Folder> folders) {
-        if (config.isFolderMode()) {
-            setFolderAdapter(folders);
-        } else {
-            setImageAdapter(images);
-        }
+        setFolderAdapter(folders);
     }
 
     @Override

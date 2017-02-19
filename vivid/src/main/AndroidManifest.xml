@@ -8,7 +8,7 @@
 
     <application>
         <activity
-            android:name="com.esafirm.imagepicker.features.ImagePickerActivity"
+            android:name="com.esafirm.imagepicker.features.imagepicker.ImagePickerActivity"
             android:configChanges="orientation|screenSize"
             android:theme="@style/ef_ImagePickerTheme"/>
 

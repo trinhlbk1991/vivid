@@ -26,7 +26,7 @@ public class ImagePickerPreferences {
     }
 
     /**
-     * Check if a permission is requestted or not (false by default)
+     * Check if a permission is requested or not (false by default)
      */
     public boolean isPermissionRequested(String permission) {
         SharedPreferences preferences = PreferenceManager.getDefaultSharedPreferences(context);

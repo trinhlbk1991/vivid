@@ -1,4 +1,4 @@
-package com.esafirm.imagepicker.features;
+package com.esafirm.imagepicker.features.imagepicker;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,6 +8,7 @@ import android.os.Looper;
 import android.widget.Toast;
 
 import com.esafirm.imagepicker.R;
+import com.esafirm.imagepicker.features.ImageLoader;
 import com.esafirm.imagepicker.features.camera.CameraModule;
 import com.esafirm.imagepicker.features.camera.DefaultCameraModule;
 import com.esafirm.imagepicker.features.camera.OnImageReadyListener;

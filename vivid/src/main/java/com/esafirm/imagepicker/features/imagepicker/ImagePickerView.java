@@ -1,4 +1,4 @@
-package com.esafirm.imagepicker.features;
+package com.esafirm.imagepicker.features.imagepicker;
 
 import com.esafirm.imagepicker.features.common.MvpView;
 import com.esafirm.imagepicker.model.Folder;

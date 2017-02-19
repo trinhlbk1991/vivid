@@ -8,7 +8,7 @@ import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
 
-import com.esafirm.imagepicker.features.ImagePickerConfig;
+import com.esafirm.imagepicker.features.imagepicker.ImagePickerConfig;
 import com.esafirm.imagepicker.helper.ImagePickerUtils;
 import com.esafirm.imagepicker.model.ImageFactory;
 
