@@ -1,6 +1,5 @@
 package com.esafirm.imagepicker.features.imagepicker;
 
-import android.content.Intent;
 import android.support.v4.app.Fragment;
 
 /**
@@ -18,7 +17,7 @@ public class ImagePickerWithFragment extends ImagePicker {
 
     @Override
     public void start(int requestCode) {
-        Intent intent = getIntent(fragment.getActivity());
-        fragment.startActivityForResult(intent, requestCode);
+        fragment.startActivityForResult(ImagePickerActivity.newIntent(fragment.getContext(), config),
+                requestCode);
     }
 }

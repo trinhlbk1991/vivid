@@ -25,17 +25,17 @@ public abstract class ImagePicker {
     public static final String EXTRA_IMAGE_DIRECTORY = "capturedImageDirectory";
     public static final String EXTRA_RETURN_AFTER_FIRST = "returnAfterFirst";
 
+    public static final int SINGLE = 1;
+    public static final int MULTIPLE = 2;
     public static final int MAX_LIMIT = 99;
 
     @Retention(SOURCE)
     @IntDef({SINGLE, MULTIPLE})
     public @interface ImagePickerMode {
+
     }
 
-    public static final int SINGLE = 1;
-    public static final int MULTIPLE = 2;
-
-    private Configuration config;
+    protected Configuration config;
 
     public abstract void start(int requestCode);
 
@@ -94,12 +94,6 @@ public abstract class ImagePicker {
     public ImagePicker capturedImageDirectory(String directory) {
         config.setCapturedImageDirectory(directory);
         return this;
-    }
-
-    public Intent getIntent(Context context) {
-        Intent intent = new Intent(context, ImagePickerActivity.class);
-        intent.putExtra(Configuration.class.getSimpleName(), config);
-        return intent;
     }
 
     public static List<Image> getImages(Intent intent) {

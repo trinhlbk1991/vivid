@@ -1,6 +1,7 @@
 package com.esafirm.imagepicker.features.imagepicker;
 
 import android.Manifest;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.ContentObserver;
@@ -52,12 +53,16 @@ import static com.esafirm.imagepicker.helper.ImagePickerPreferences.PREF_WRITE_E
 public class ImagePickerActivity extends AppCompatActivity
         implements ImagePickerView, OnImageClickListener {
 
+    private static final String TAG = ImagePickerActivity.class.getSimpleName();
     private static final int RC_CAPTURE = 2000;
+    public static final int RC_PERMISSION_WRITE_EXTERNAL_STORAGE = 23;
+    public static final int RC_PERMISSION_CAMERA = 24;
 
-    private static final String TAG = "ImagePickerActivity";
-
-    public static final int RC_PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE = 23;
-    public static final int RC_PERMISSION_REQUEST_CAMERA = 24;
+    public static Intent newIntent(Context context, Configuration config) {
+        Intent intent = new Intent(context, ImagePickerActivity.class);
+        intent.putExtra(Configuration.class.getSimpleName(), config);
+        return intent;
+    }
 
     private ActionBar actionBar;
     private RelativeLayout mainLayout;
@@ -304,12 +309,12 @@ public class ImagePickerActivity extends AppCompatActivity
         final String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
 
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            ActivityCompat.requestPermissions(this, permissions, RC_PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE);
+            ActivityCompat.requestPermissions(this, permissions, RC_PERMISSION_WRITE_EXTERNAL_STORAGE);
         } else {
             final String permission = PREF_WRITE_EXTERNAL_STORAGE_REQUESTED;
             if (!preferences.isPermissionRequested(permission)) {
                 preferences.setPermissionRequested(permission);
-                ActivityCompat.requestPermissions(this, permissions, RC_PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE);
+                ActivityCompat.requestPermissions(this, permissions, RC_PERMISSION_WRITE_EXTERNAL_STORAGE);
             } else {
                 Snackbar snackbar = Snackbar.make(mainLayout, R.string.ef_msg_no_write_external_permission,
                         Snackbar.LENGTH_INDEFINITE);
@@ -332,12 +337,12 @@ public class ImagePickerActivity extends AppCompatActivity
         final String[] permissions = new String[]{Manifest.permission.CAMERA};
 
         if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-            ActivityCompat.requestPermissions(this, permissions, RC_PERMISSION_REQUEST_CAMERA);
+            ActivityCompat.requestPermissions(this, permissions, RC_PERMISSION_CAMERA);
         } else {
             final String permission = ImagePickerPreferences.PREF_CAMERA_REQUESTED;
             if (!preferences.isPermissionRequested(permission)) {
                 preferences.setPermissionRequested(permission);
-                ActivityCompat.requestPermissions(this, permissions, RC_PERMISSION_REQUEST_CAMERA);
+                ActivityCompat.requestPermissions(this, permissions, RC_PERMISSION_CAMERA);
             } else {
                 Snackbar snackbar = Snackbar.make(mainLayout, R.string.ef_msg_no_camera_permission,
                         Snackbar.LENGTH_INDEFINITE);
@@ -359,7 +364,7 @@ public class ImagePickerActivity extends AppCompatActivity
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
 
         switch (requestCode) {
-            case RC_PERMISSION_REQUEST_WRITE_EXTERNAL_STORAGE: {
+            case RC_PERMISSION_WRITE_EXTERNAL_STORAGE: {
                 if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d(TAG, "Write External permission granted");
                     getData();
@@ -370,7 +375,7 @@ public class ImagePickerActivity extends AppCompatActivity
                 finish();
             }
             break;
-            case RC_PERMISSION_REQUEST_CAMERA: {
+            case RC_PERMISSION_CAMERA: {
                 if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     Log.d(TAG, "Camera permission granted");
                     captureImage();
