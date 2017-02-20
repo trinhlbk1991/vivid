@@ -1,6 +1,7 @@
 package com.icetea09.vivid.features.imagepicker;
 
 import android.content.Context;
+import android.content.Intent;
 import android.os.Parcel;
 import android.os.Parcelable;
 
@@ -9,17 +10,37 @@ import com.icetea09.vivid.model.Image;
 
 import java.util.ArrayList;
 
+import static com.icetea09.vivid.features.imagepicker.ImagePicker.EXTRA_FOLDER_TITLE;
+import static com.icetea09.vivid.features.imagepicker.ImagePicker.EXTRA_IMAGE_DIRECTORY;
+import static com.icetea09.vivid.features.imagepicker.ImagePicker.EXTRA_IMAGE_TITLE;
+import static com.icetea09.vivid.features.imagepicker.ImagePicker.EXTRA_LIMIT;
+import static com.icetea09.vivid.features.imagepicker.ImagePicker.EXTRA_MODE;
+import static com.icetea09.vivid.features.imagepicker.ImagePicker.EXTRA_RETURN_AFTER_FIRST;
+import static com.icetea09.vivid.features.imagepicker.ImagePicker.EXTRA_SELECTED_IMAGES;
+import static com.icetea09.vivid.features.imagepicker.ImagePicker.MAX_LIMIT;
+import static com.icetea09.vivid.features.imagepicker.ImagePicker.MULTIPLE;
+
 public class Configuration implements Parcelable {
 
     private ArrayList<Image> selectedImages;
-
     private String folderTitle;
     private String imageTitle;
     private String capturedImageDirectory;
     private int mode;
     private int limit;
-
     private boolean returnAfterFirst;
+
+    public static Configuration create(Context context, Intent intent) {
+        Configuration config = new Configuration(context);
+        config.setMode(intent.getIntExtra(EXTRA_MODE, MULTIPLE));
+        config.setLimit(intent.getIntExtra(EXTRA_LIMIT, MAX_LIMIT));
+        config.setFolderTitle(intent.getStringExtra(EXTRA_FOLDER_TITLE));
+        config.setImageTitle(intent.getStringExtra(EXTRA_IMAGE_TITLE));
+        config.setSelectedImages(intent.<Image>getParcelableArrayListExtra(EXTRA_SELECTED_IMAGES));
+        config.setCapturedImageDirectory(intent.getStringExtra(EXTRA_IMAGE_DIRECTORY));
+        config.setReturnAfterFirst(intent.getBooleanExtra(EXTRA_RETURN_AFTER_FIRST, false));
+        return config;
+    }
 
     public Configuration(Context context) {
         this.mode = ImagePicker.MULTIPLE;

@@ -35,7 +35,6 @@ import com.icetea09.vivid.adapter.ImagePickerAdapter;
 import com.icetea09.vivid.features.ImageLoader;
 import com.icetea09.vivid.features.camera.CameraHelper;
 import com.icetea09.vivid.helper.ImagePickerPreferences;
-import com.icetea09.vivid.helper.IntentHelper;
 import com.icetea09.vivid.listeners.OnFolderClickListener;
 import com.icetea09.vivid.listeners.OnImageClickListener;
 import com.icetea09.vivid.model.Folder;
@@ -69,7 +68,6 @@ public class ImagePickerActivity extends AppCompatActivity
     private ProgressBar progressBar;
     private TextView emptyTextView;
     private RecyclerView recyclerView;
-
     private GridLayoutManager layoutManager;
     private GridSpacingItemDecoration itemOffsetDecoration;
 
@@ -132,7 +130,7 @@ public class ImagePickerActivity extends AppCompatActivity
 
         config = bundle.getParcelable(Configuration.class.getSimpleName());
         if (config == null) {
-            config = IntentHelper.makeConfigFromIntent(this, intent);
+            config = Configuration.create(this, intent);
         }
 
         ArrayList<Image> selectedImages = null;
