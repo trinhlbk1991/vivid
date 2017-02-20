@@ -6,7 +6,7 @@
 
     <include
         android:id="@+id/toolbar"
-        layout="@layout/ef_imagepicker_toolbar"
+        layout="@layout/imagepicker_toolbar"
         android:layout_width="match_parent"
         android:layout_height="wrap_content" />
 
@@ -20,14 +20,12 @@
         android:textSize="@dimen/ef_font_medium"
         android:visibility="gone" />
 
-    <com.icetea09.vivid.view.ProgressWheel xmlns:wheel="http://schemas.android.com/apk/res-auto"
+    <ProgressBar
         android:id="@+id/progress_bar"
         android:layout_width="100dp"
         android:layout_height="100dp"
         android:layout_centerInParent="true"
-        android:visibility="gone"
-        wheel:ef_matProg_barColor="@color/ef_teal"
-        wheel:ef_matProg_progressIndeterminate="true" />
+        android:visibility="gone" />
 
     <android.support.v7.widget.RecyclerView
         android:id="@+id/recyclerView"

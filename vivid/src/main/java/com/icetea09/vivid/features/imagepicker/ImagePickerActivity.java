@@ -24,6 +24,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
 import android.widget.RelativeLayout;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -40,7 +41,6 @@ import com.icetea09.vivid.listeners.OnImageClickListener;
 import com.icetea09.vivid.model.Folder;
 import com.icetea09.vivid.model.Image;
 import com.icetea09.vivid.view.GridSpacingItemDecoration;
-import com.icetea09.vivid.view.ProgressWheel;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -66,7 +66,7 @@ public class ImagePickerActivity extends AppCompatActivity
 
     private ActionBar actionBar;
     private RelativeLayout mainLayout;
-    private ProgressWheel progressBar;
+    private ProgressBar progressBar;
     private TextView emptyTextView;
     private RecyclerView recyclerView;
 
@@ -110,7 +110,7 @@ public class ImagePickerActivity extends AppCompatActivity
 
     private void setupView() {
         mainLayout = (RelativeLayout) findViewById(R.id.main);
-        progressBar = (ProgressWheel) findViewById(R.id.progress_bar);
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
         emptyTextView = (TextView) findViewById(R.id.tv_empty_images);
         recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
 
