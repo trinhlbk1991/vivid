@@ -3,7 +3,6 @@ package com.esafirm.imagepicker.features.imagepicker;
 import android.Manifest;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.content.res.Configuration;
 import android.database.ContentObserver;
 import android.net.Uri;
 import android.os.Build;
@@ -72,7 +71,7 @@ public class ImagePickerActivity extends AppCompatActivity
     private ImagePickerPresenter presenter;
     private ImagePickerPreferences preferences;
     private ImagePickerAdapter imageAdapter;
-    private ImagePickerConfig config;
+    private Configuration config;
     private FolderPickerAdapter folderAdapter;
 
     private Handler handler;
@@ -126,7 +125,7 @@ public class ImagePickerActivity extends AppCompatActivity
         Intent intent = getIntent();
         Bundle bundle = intent.getExtras();
 
-        config = bundle.getParcelable(ImagePickerConfig.class.getSimpleName());
+        config = bundle.getParcelable(Configuration.class.getSimpleName());
         if (config == null) {
             config = IntentHelper.makeConfigFromIntent(this, intent);
         }
@@ -246,7 +245,7 @@ public class ImagePickerActivity extends AppCompatActivity
      * Config recyclerView when configuration changed
      */
     @Override
-    public void onConfigurationChanged(Configuration newConfig) {
+    public void onConfigurationChanged(android.content.res.Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         orientationBasedUI(newConfig.orientation);
     }
@@ -255,8 +254,8 @@ public class ImagePickerActivity extends AppCompatActivity
      * Set item size, column size base on the screen orientation
      */
     private void orientationBasedUI(int orientation) {
-        imageColumns = orientation == Configuration.ORIENTATION_PORTRAIT ? 3 : 5;
-        folderColumns = orientation == Configuration.ORIENTATION_PORTRAIT ? 2 : 4;
+        imageColumns = orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT ? 3 : 5;
+        folderColumns = orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT ? 2 : 4;
 
         int columns = isDisplayingFolderView() ? folderColumns : imageColumns;
         layoutManager = new GridLayoutManager(this, columns);

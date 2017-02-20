@@ -3,7 +3,7 @@ package com.esafirm.imagepicker.helper;
 import android.content.Context;
 import android.content.Intent;
 
-import com.esafirm.imagepicker.features.imagepicker.ImagePickerConfig;
+import com.esafirm.imagepicker.features.imagepicker.Configuration;
 import com.esafirm.imagepicker.model.Image;
 
 import static com.esafirm.imagepicker.features.imagepicker.ImagePicker.EXTRA_FOLDER_TITLE;
@@ -18,8 +18,8 @@ import static com.esafirm.imagepicker.features.imagepicker.ImagePicker.MULTIPLE;
 
 public class IntentHelper {
 
-    public static ImagePickerConfig makeConfigFromIntent(Context context, Intent intent) {
-        ImagePickerConfig config = new ImagePickerConfig(context);
+    public static Configuration makeConfigFromIntent(Context context, Intent intent) {
+        Configuration config = new Configuration(context);
         config.setMode(intent.getIntExtra(EXTRA_MODE, MULTIPLE));
         config.setLimit(intent.getIntExtra(EXTRA_LIMIT, MAX_LIMIT));
         config.setFolderTitle(intent.getStringExtra(EXTRA_FOLDER_TITLE));

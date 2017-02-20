@@ -95,7 +95,7 @@ public class ImagePickerPresenter extends BasePresenter<ImagePickerView> {
         }
     }
 
-    public void captureImage(Activity activity, ImagePickerConfig config, int requestCode) {
+    public void captureImage(Activity activity, Configuration config, int requestCode) {
         Context context = activity.getApplicationContext();
         Intent intent = cameraModule.getCameraIntent(activity, config);
         if (intent == null) {
@@ -105,7 +105,7 @@ public class ImagePickerPresenter extends BasePresenter<ImagePickerView> {
         activity.startActivityForResult(intent, requestCode);
     }
 
-    public void finishCaptureImage(Context context, Intent data, final ImagePickerConfig config) {
+    public void finishCaptureImage(Context context, Intent data, final Configuration config) {
         cameraModule.getImage(context, data, new OnImageReadyListener() {
             @Override
             public void onImageReady(List<Image> images) {

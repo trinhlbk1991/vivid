@@ -9,7 +9,7 @@ import com.esafirm.imagepicker.model.Image;
 
 import java.util.ArrayList;
 
-public class ImagePickerConfig implements Parcelable {
+public class Configuration implements Parcelable {
 
     private ArrayList<Image> selectedImages;
 
@@ -21,7 +21,7 @@ public class ImagePickerConfig implements Parcelable {
 
     private boolean returnAfterFirst;
 
-    public ImagePickerConfig(Context context) {
+    public Configuration(Context context) {
         this.mode = ImagePicker.MULTIPLE;
         this.limit = ImagePicker.MAX_LIMIT;
         this.folderTitle = context.getString(R.string.ef_title_folder);
@@ -103,7 +103,7 @@ public class ImagePickerConfig implements Parcelable {
         dest.writeByte(this.returnAfterFirst ? (byte) 1 : (byte) 0);
     }
 
-    protected ImagePickerConfig(Parcel in) {
+    protected Configuration(Parcel in) {
         this.selectedImages = in.createTypedArrayList(Image.CREATOR);
         this.folderTitle = in.readString();
         this.imageTitle = in.readString();
@@ -113,15 +113,15 @@ public class ImagePickerConfig implements Parcelable {
         this.returnAfterFirst = in.readByte() != 0;
     }
 
-    public static final Creator<ImagePickerConfig> CREATOR = new Creator<ImagePickerConfig>() {
+    public static final Creator<Configuration> CREATOR = new Creator<Configuration>() {
         @Override
-        public ImagePickerConfig createFromParcel(Parcel source) {
-            return new ImagePickerConfig(source);
+        public Configuration createFromParcel(Parcel source) {
+            return new Configuration(source);
         }
 
         @Override
-        public ImagePickerConfig[] newArray(int size) {
-            return new ImagePickerConfig[size];
+        public Configuration[] newArray(int size) {
+            return new Configuration[size];
         }
     };
 }

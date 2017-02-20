@@ -35,7 +35,7 @@ public abstract class ImagePicker {
     public static final int SINGLE = 1;
     public static final int MULTIPLE = 2;
 
-    private ImagePickerConfig config;
+    private Configuration config;
 
     public abstract void start(int requestCode);
 
@@ -48,7 +48,7 @@ public abstract class ImagePicker {
     }
 
     void init(Context context) {
-        config = new ImagePickerConfig(context);
+        config = new Configuration(context);
     }
 
     /**
@@ -98,7 +98,7 @@ public abstract class ImagePicker {
 
     public Intent getIntent(Context context) {
         Intent intent = new Intent(context, ImagePickerActivity.class);
-        intent.putExtra(ImagePickerConfig.class.getSimpleName(), config);
+        intent.putExtra(Configuration.class.getSimpleName(), config);
         return intent;
     }
 
