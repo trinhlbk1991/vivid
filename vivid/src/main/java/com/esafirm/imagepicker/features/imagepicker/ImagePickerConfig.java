@@ -15,8 +15,7 @@ public class ImagePickerConfig implements Parcelable {
 
     private String folderTitle;
     private String imageTitle;
-    private String imageDirectory;
-
+    private String capturedImageDirectory;
     private int mode;
     private int limit;
 
@@ -28,7 +27,7 @@ public class ImagePickerConfig implements Parcelable {
         this.folderTitle = context.getString(R.string.ef_title_folder);
         this.imageTitle = context.getString(R.string.ef_title_select_image);
         this.selectedImages = new ArrayList<>();
-        this.imageDirectory = context.getString(R.string.ef_image_directory);
+        this.capturedImageDirectory = context.getString(R.string.ef_image_directory);
         this.returnAfterFirst = true;
     }
 
@@ -80,12 +79,12 @@ public class ImagePickerConfig implements Parcelable {
         this.selectedImages = selectedImages;
     }
 
-    public String getImageDirectory() {
-        return imageDirectory;
+    public String getCapturedImageDirectory() {
+        return capturedImageDirectory;
     }
 
-    public void setImageDirectory(String imageDirectory) {
-        this.imageDirectory = imageDirectory;
+    public void setCapturedImageDirectory(String capturedImageDirectory) {
+        this.capturedImageDirectory = capturedImageDirectory;
     }
 
     @Override
@@ -98,7 +97,7 @@ public class ImagePickerConfig implements Parcelable {
         dest.writeTypedList(this.selectedImages);
         dest.writeString(this.folderTitle);
         dest.writeString(this.imageTitle);
-        dest.writeString(this.imageDirectory);
+        dest.writeString(this.capturedImageDirectory);
         dest.writeInt(this.mode);
         dest.writeInt(this.limit);
         dest.writeByte(this.returnAfterFirst ? (byte) 1 : (byte) 0);
@@ -108,7 +107,7 @@ public class ImagePickerConfig implements Parcelable {
         this.selectedImages = in.createTypedArrayList(Image.CREATOR);
         this.folderTitle = in.readString();
         this.imageTitle = in.readString();
-        this.imageDirectory = in.readString();
+        this.capturedImageDirectory = in.readString();
         this.mode = in.readInt();
         this.limit = in.readInt();
         this.returnAfterFirst = in.readByte() != 0;

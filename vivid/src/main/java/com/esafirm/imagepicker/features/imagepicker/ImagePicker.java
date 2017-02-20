@@ -9,7 +9,6 @@ import android.support.v4.app.Fragment;
 import com.esafirm.imagepicker.model.Image;
 
 import java.lang.annotation.Retention;
-import java.util.ArrayList;
 import java.util.List;
 
 import static java.lang.annotation.RetentionPolicy.SOURCE;
@@ -23,7 +22,7 @@ public abstract class ImagePicker {
     public static final String EXTRA_FOLDER_MODE = "folderMode";
     public static final String EXTRA_FOLDER_TITLE = "folderTitle";
     public static final String EXTRA_IMAGE_TITLE = "imageTitle";
-    public static final String EXTRA_IMAGE_DIRECTORY = "imageDirectory";
+    public static final String EXTRA_IMAGE_DIRECTORY = "capturedImageDirectory";
     public static final String EXTRA_RETURN_AFTER_FIRST = "returnAfterFirst";
 
     public static final int MAX_LIMIT = 99;
@@ -86,8 +85,14 @@ public abstract class ImagePicker {
         return this;
     }
 
-    public ImagePicker imageDirectory(String directory) {
-        config.setImageDirectory(directory);
+    /**
+     * Set the location to store captured images
+     *
+     * @param directory name of the directory
+     * @return ImagePicker object
+     */
+    public ImagePicker capturedImageDirectory(String directory) {
+        config.setCapturedImageDirectory(directory);
         return this;
     }
 

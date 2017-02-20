@@ -109,7 +109,7 @@ public class MainActivity extends AppCompatActivity {
 
 
         imagePicker.limit(10) // max images can be selected (99 by default)
-                .imageDirectory("Camera")   // captured image directory name ("Camera" folder by default)
+                .capturedImageDirectory("Camera")   // captured image directory name ("Camera" folder by default)
                 .start(RC_CODE_PICKER); // start image picker activity with request code
     }
 
