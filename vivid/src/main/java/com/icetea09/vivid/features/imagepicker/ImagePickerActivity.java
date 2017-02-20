@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.ContentObserver;
+import android.databinding.DataBindingUtil;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -32,6 +33,7 @@ import android.widget.Toast;
 import com.icetea09.vivid.R;
 import com.icetea09.vivid.adapter.FolderPickerAdapter;
 import com.icetea09.vivid.adapter.ImagePickerAdapter;
+import com.icetea09.vivid.databinding.ActivityImagePickerBinding;
 import com.icetea09.vivid.features.ImageLoader;
 import com.icetea09.vivid.features.camera.CameraHelper;
 import com.icetea09.vivid.helper.ImagePickerPreferences;
@@ -63,11 +65,8 @@ public class ImagePickerActivity extends AppCompatActivity
         return intent;
     }
 
+    ActivityImagePickerBinding binding;
     private ActionBar actionBar;
-    private RelativeLayout mainLayout;
-    private ProgressBar progressBar;
-    private TextView emptyTextView;
-    private RecyclerView recyclerView;
     private GridLayoutManager layoutManager;
     private GridSpacingItemDecoration itemOffsetDecoration;
 
@@ -79,7 +78,6 @@ public class ImagePickerActivity extends AppCompatActivity
 
     private Handler handler;
     private ContentObserver observer;
-
     private Parcelable foldersState;
 
     private int imageColumns;
@@ -88,7 +86,7 @@ public class ImagePickerActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        setContentView(R.layout.activity_image_picker);
+        DataBindingUtil.setContentView(this, R.layout.activity_image_picker);
 
         Intent intent = getIntent();
         if (intent == null || intent.getExtras() == null) {
@@ -107,11 +105,6 @@ public class ImagePickerActivity extends AppCompatActivity
     }
 
     private void setupView() {
-        mainLayout = (RelativeLayout) findViewById(R.id.main);
-        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
-        emptyTextView = (TextView) findViewById(R.id.tv_empty_images);
-        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
-
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
         actionBar = getSupportActionBar();
@@ -146,7 +139,7 @@ public class ImagePickerActivity extends AppCompatActivity
         folderAdapter = new FolderPickerAdapter(this, new OnFolderClickListener() {
             @Override
             public void onFolderClick(Folder bucket) {
-                foldersState = recyclerView.getLayoutManager().onSaveInstanceState();
+                foldersState = binding.recyclerView.getLayoutManager().onSaveInstanceState();
                 setImageAdapter(bucket.getImages());
             }
         });
@@ -167,7 +160,7 @@ public class ImagePickerActivity extends AppCompatActivity
     private void setImageAdapter(List<Image> images) {
         imageAdapter.setData(images);
         setItemDecoration(imageColumns);
-        recyclerView.setAdapter(imageAdapter);
+        binding.recyclerView.setAdapter(imageAdapter);
         updateTitle();
     }
 
@@ -182,11 +175,11 @@ public class ImagePickerActivity extends AppCompatActivity
             folderAdapter.setData(folders);
         }
         setItemDecoration(folderColumns);
-        recyclerView.setAdapter(folderAdapter);
+        binding.recyclerView.setAdapter(folderAdapter);
 
         if (foldersState != null) {
             layoutManager.setSpanCount(folderColumns);
-            recyclerView.getLayoutManager().onRestoreInstanceState(foldersState);
+            binding.recyclerView.getLayoutManager().onRestoreInstanceState(foldersState);
         }
         updateTitle();
     }
@@ -262,8 +255,8 @@ public class ImagePickerActivity extends AppCompatActivity
 
         int columns = isDisplayingFolderView() ? folderColumns : imageColumns;
         layoutManager = new GridLayoutManager(this, columns);
-        recyclerView.setLayoutManager(layoutManager);
-        recyclerView.setHasFixedSize(true);
+        binding.recyclerView.setLayoutManager(layoutManager);
+        binding.recyclerView.setHasFixedSize(true);
         setItemDecoration(columns);
     }
 
@@ -273,9 +266,9 @@ public class ImagePickerActivity extends AppCompatActivity
     private void setItemDecoration(int columns) {
         layoutManager.setSpanCount(columns);
         if (itemOffsetDecoration != null)
-            recyclerView.removeItemDecoration(itemOffsetDecoration);
+            binding.recyclerView.removeItemDecoration(itemOffsetDecoration);
         itemOffsetDecoration = new GridSpacingItemDecoration(columns, getResources().getDimensionPixelSize(R.dimen.ef_item_padding), false);
-        recyclerView.addItemDecoration(itemOffsetDecoration);
+        binding.recyclerView.addItemDecoration(itemOffsetDecoration);
     }
 
 
@@ -299,7 +292,7 @@ public class ImagePickerActivity extends AppCompatActivity
     /**
      * Request for permission
      * If permission denied or app is first launched, request for permission
-     * If permission denied and user choose 'Nerver Ask Again', show snackbar with an action that navigate to app settings
+     * If permission denied and user choose 'Never Ask Again', show snackbar with an action that navigate to app settings
      */
     private void requestWriteExternalPermission() {
         Log.w(TAG, "Write External permission is not granted. Requesting permission");
@@ -314,7 +307,7 @@ public class ImagePickerActivity extends AppCompatActivity
                 preferences.setPermissionRequested(permission);
                 ActivityCompat.requestPermissions(this, permissions, RC_PERMISSION_WRITE_EXTERNAL_STORAGE);
             } else {
-                Snackbar snackbar = Snackbar.make(mainLayout, R.string.ef_msg_no_write_external_permission,
+                Snackbar snackbar = Snackbar.make(binding.layoutMain, R.string.ef_msg_no_write_external_permission,
                         Snackbar.LENGTH_INDEFINITE);
                 snackbar.setAction(R.string.ef_ok, new View.OnClickListener() {
                     @Override
@@ -342,7 +335,7 @@ public class ImagePickerActivity extends AppCompatActivity
                 preferences.setPermissionRequested(permission);
                 ActivityCompat.requestPermissions(this, permissions, RC_PERMISSION_CAMERA);
             } else {
-                Snackbar snackbar = Snackbar.make(mainLayout, R.string.ef_msg_no_camera_permission,
+                Snackbar snackbar = Snackbar.make(binding.layoutMain, R.string.ef_msg_no_camera_permission,
                         Snackbar.LENGTH_INDEFINITE);
                 snackbar.setAction(R.string.ef_ok, new View.OnClickListener() {
                     @Override
@@ -552,7 +545,7 @@ public class ImagePickerActivity extends AppCompatActivity
      * Check if displaying folders view
      */
     private boolean isDisplayingFolderView() {
-        return ((recyclerView.getAdapter() == null || recyclerView.getAdapter() instanceof FolderPickerAdapter));
+        return ((binding.recyclerView.getAdapter() == null || binding.recyclerView.getAdapter() instanceof FolderPickerAdapter));
     }
 
     /**
@@ -598,16 +591,16 @@ public class ImagePickerActivity extends AppCompatActivity
 
     @Override
     public void showLoading(boolean isLoading) {
-        progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
-        recyclerView.setVisibility(isLoading ? View.GONE : View.VISIBLE);
-        emptyTextView.setVisibility(View.GONE);
+        binding.progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        binding.recyclerView.setVisibility(isLoading ? View.GONE : View.VISIBLE);
+        binding.tvEmptyImages.setVisibility(View.GONE);
     }
 
     @Override
     public void showEmpty() {
-        progressBar.setVisibility(View.GONE);
-        recyclerView.setVisibility(View.GONE);
-        emptyTextView.setVisibility(View.VISIBLE);
+        binding.progressBar.setVisibility(View.GONE);
+        binding.recyclerView.setVisibility(View.GONE);
+        binding.tvEmptyImages.setVisibility(View.VISIBLE);
     }
 
 }
