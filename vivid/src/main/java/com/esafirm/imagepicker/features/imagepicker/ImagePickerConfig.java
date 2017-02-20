@@ -20,13 +20,11 @@ public class ImagePickerConfig implements Parcelable {
     private int mode;
     private int limit;
 
-    private boolean showCamera;
     private boolean returnAfterFirst;
 
     public ImagePickerConfig(Context context) {
         this.mode = ImagePicker.MULTIPLE;
         this.limit = ImagePicker.MAX_LIMIT;
-        this.showCamera = true;
         this.folderTitle = context.getString(R.string.ef_title_folder);
         this.imageTitle = context.getString(R.string.ef_title_select_image);
         this.selectedImages = new ArrayList<>();
@@ -56,14 +54,6 @@ public class ImagePickerConfig implements Parcelable {
 
     public void setLimit(int limit) {
         this.limit = limit;
-    }
-
-    public boolean isShowCamera() {
-        return showCamera;
-    }
-
-    public void setShowCamera(boolean showCamera) {
-        this.showCamera = showCamera;
     }
 
     public String getFolderTitle() {
@@ -98,10 +88,6 @@ public class ImagePickerConfig implements Parcelable {
         this.imageDirectory = imageDirectory;
     }
 
-    /* --------------------------------------------------- */
-    /* > Parcelable */
-    /* --------------------------------------------------- */
-
     @Override
     public int describeContents() {
         return 0;
@@ -115,7 +101,6 @@ public class ImagePickerConfig implements Parcelable {
         dest.writeString(this.imageDirectory);
         dest.writeInt(this.mode);
         dest.writeInt(this.limit);
-        dest.writeByte(this.showCamera ? (byte) 1 : (byte) 0);
         dest.writeByte(this.returnAfterFirst ? (byte) 1 : (byte) 0);
     }
 
@@ -126,7 +111,6 @@ public class ImagePickerConfig implements Parcelable {
         this.imageDirectory = in.readString();
         this.mode = in.readInt();
         this.limit = in.readInt();
-        this.showCamera = in.readByte() != 0;
         this.returnAfterFirst = in.readByte() != 0;
     }
 

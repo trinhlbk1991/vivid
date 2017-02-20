@@ -200,11 +200,6 @@ public class ImagePickerActivity extends AppCompatActivity
 
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
-        MenuItem menuCamera = menu.findItem(R.id.menu_camera);
-        if (menuCamera != null) {
-            menuCamera.setVisible(config.isShowCamera());
-        }
-
         MenuItem menuDone = menu.findItem(R.id.menu_done);
         if (menuDone != null) {
             menuDone.setVisible(!isDisplayingFolderView() && !imageAdapter.getSelectedImages().isEmpty());

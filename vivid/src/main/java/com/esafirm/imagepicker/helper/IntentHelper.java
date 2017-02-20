@@ -24,7 +24,6 @@ public class IntentHelper {
         ImagePickerConfig config = new ImagePickerConfig(context);
         config.setMode(intent.getIntExtra(EXTRA_MODE, MULTIPLE));
         config.setLimit(intent.getIntExtra(EXTRA_LIMIT, MAX_LIMIT));
-        config.setShowCamera(intent.getBooleanExtra(EXTRA_SHOW_CAMERA, true));
         config.setFolderTitle(intent.getStringExtra(EXTRA_FOLDER_TITLE));
         config.setImageTitle(intent.getStringExtra(EXTRA_IMAGE_TITLE));
         config.setSelectedImages(intent.<Image>getParcelableArrayListExtra(EXTRA_SELECTED_IMAGES));
