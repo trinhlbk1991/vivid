@@ -35,7 +35,9 @@ public class ImagePickerPresenter extends BasePresenter<ImagePickerView> {
     }
 
     public void loadImages(boolean isFolderMode) {
-        if (!isViewAttached()) return;
+        if (!isViewAttached()) {
+            return;
+        }
 
         getView().showLoading(true);
         imageLoader.loadDeviceImages(isFolderMode, new ImageLoaderListener() {

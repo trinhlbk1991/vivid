@@ -1,6 +1,6 @@
 package com.icetea09.vivid.features.common;
 
-public class BasePresenter<T extends MvpView> {
+public class BasePresenter<T> {
 
     private T view;
 

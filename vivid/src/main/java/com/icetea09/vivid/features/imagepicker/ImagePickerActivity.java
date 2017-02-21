@@ -14,20 +14,14 @@ import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.provider.Settings;
 import android.support.annotation.NonNull;
-import android.support.design.widget.Snackbar;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
-import android.support.v7.widget.RecyclerView;
-import android.support.v7.widget.Toolbar;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.ProgressBar;
-import android.widget.RelativeLayout;
-import android.widget.TextView;
 import android.widget.Toast;
 
 import com.icetea09.vivid.R;
@@ -36,7 +30,6 @@ import com.icetea09.vivid.adapter.ImagePickerAdapter;
 import com.icetea09.vivid.databinding.ActivityImagePickerBinding;
 import com.icetea09.vivid.features.ImageLoader;
 import com.icetea09.vivid.features.camera.CameraHelper;
-import com.icetea09.vivid.helper.ImagePickerPreferences;
 import com.icetea09.vivid.listeners.OnFolderClickListener;
 import com.icetea09.vivid.listeners.OnImageClickListener;
 import com.icetea09.vivid.model.Folder;
@@ -49,15 +42,14 @@ import java.util.List;
 import static com.icetea09.vivid.features.imagepicker.ImagePicker.EXTRA_SELECTED_IMAGES;
 import static com.icetea09.vivid.features.imagepicker.ImagePicker.MULTIPLE;
 import static com.icetea09.vivid.features.imagepicker.ImagePicker.SINGLE;
-import static com.icetea09.vivid.helper.ImagePickerPreferences.PREF_WRITE_EXTERNAL_STORAGE_REQUESTED;
 
 public class ImagePickerActivity extends AppCompatActivity
         implements ImagePickerView, OnImageClickListener {
 
     private static final String TAG = ImagePickerActivity.class.getSimpleName();
     private static final int RC_CAPTURE = 2000;
-    public static final int RC_PERMISSION_WRITE_EXTERNAL_STORAGE = 23;
-    public static final int RC_PERMISSION_CAMERA = 24;
+    public static final int RC_PERMISSION_WRITE_EXTERNAL_STORAGE = 9653;
+    public static final int RC_PERMISSION_CAMERA = 3524;
 
     public static Intent newIntent(Context context, Configuration config) {
         Intent intent = new Intent(context, ImagePickerActivity.class);
@@ -69,12 +61,11 @@ public class ImagePickerActivity extends AppCompatActivity
     private ActionBar actionBar;
     private GridLayoutManager layoutManager;
     private GridSpacingItemDecoration itemOffsetDecoration;
+    private ImagePickerAdapter imageAdapter;
+    private FolderPickerAdapter folderAdapter;
 
     private ImagePickerPresenter presenter;
-    private ImagePickerPreferences preferences;
-    private ImagePickerAdapter imageAdapter;
     private Configuration config;
-    private FolderPickerAdapter folderAdapter;
 
     private Handler handler;
     private ContentObserver observer;
@@ -86,7 +77,7 @@ public class ImagePickerActivity extends AppCompatActivity
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        DataBindingUtil.setContentView(this, R.layout.activity_image_picker);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_image_picker);
 
         Intent intent = getIntent();
         if (intent == null || intent.getExtras() == null) {
@@ -94,19 +85,16 @@ public class ImagePickerActivity extends AppCompatActivity
             return;
         }
 
-        preferences = new ImagePickerPreferences(this);
         presenter = new ImagePickerPresenter(new ImageLoader(this));
         presenter.attachView(this);
 
         setupExtras();
         setupView();
-
         orientationBasedUI(getResources().getConfiguration().orientation);
     }
 
     private void setupView() {
-        Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
-        setSupportActionBar(toolbar);
+        setSupportActionBar(binding.toolbar);
         actionBar = getSupportActionBar();
 
         if (actionBar != null) {
@@ -280,7 +268,8 @@ public class ImagePickerActivity extends AppCompatActivity
         if (rc == PackageManager.PERMISSION_GRANTED) {
             getData();
         } else {
-            requestWriteExternalPermission();
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    RC_PERMISSION_WRITE_EXTERNAL_STORAGE);
         }
     }
 
@@ -290,108 +279,30 @@ public class ImagePickerActivity extends AppCompatActivity
     }
 
     /**
-     * Request for permission
-     * If permission denied or app is first launched, request for permission
-     * If permission denied and user choose 'Never Ask Again', show snackbar with an action that navigate to app settings
-     */
-    private void requestWriteExternalPermission() {
-        Log.w(TAG, "Write External permission is not granted. Requesting permission");
-
-        final String[] permissions = new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE};
-
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)) {
-            ActivityCompat.requestPermissions(this, permissions, RC_PERMISSION_WRITE_EXTERNAL_STORAGE);
-        } else {
-            final String permission = PREF_WRITE_EXTERNAL_STORAGE_REQUESTED;
-            if (!preferences.isPermissionRequested(permission)) {
-                preferences.setPermissionRequested(permission);
-                ActivityCompat.requestPermissions(this, permissions, RC_PERMISSION_WRITE_EXTERNAL_STORAGE);
-            } else {
-                Snackbar snackbar = Snackbar.make(binding.layoutMain, R.string.ef_msg_no_write_external_permission,
-                        Snackbar.LENGTH_INDEFINITE);
-                snackbar.setAction(R.string.ef_ok, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        openAppSettings();
-                    }
-                });
-                snackbar.show();
-            }
-        }
-
-    }
-
-
-    private void requestCameraPermission() {
-        Log.w(TAG, "Write External permission is not granted. Requesting permission");
-
-        final String[] permissions = new String[]{Manifest.permission.CAMERA};
-
-        if (ActivityCompat.shouldShowRequestPermissionRationale(this, Manifest.permission.CAMERA)) {
-            ActivityCompat.requestPermissions(this, permissions, RC_PERMISSION_CAMERA);
-        } else {
-            final String permission = ImagePickerPreferences.PREF_CAMERA_REQUESTED;
-            if (!preferences.isPermissionRequested(permission)) {
-                preferences.setPermissionRequested(permission);
-                ActivityCompat.requestPermissions(this, permissions, RC_PERMISSION_CAMERA);
-            } else {
-                Snackbar snackbar = Snackbar.make(binding.layoutMain, R.string.ef_msg_no_camera_permission,
-                        Snackbar.LENGTH_INDEFINITE);
-                snackbar.setAction(R.string.ef_ok, new View.OnClickListener() {
-                    @Override
-                    public void onClick(View view) {
-                        openAppSettings();
-                    }
-                });
-                snackbar.show();
-            }
-        }
-    }
-
-    /**
      * Handle permission results
      */
     @Override
     public void onRequestPermissionsResult(int requestCode, @NonNull String[] permissions, @NonNull int[] grantResults) {
-
         switch (requestCode) {
             case RC_PERMISSION_WRITE_EXTERNAL_STORAGE: {
                 if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d(TAG, "Write External permission granted");
                     getData();
                     return;
                 }
-                Log.e(TAG, "Permission not granted: results len = " + grantResults.length +
-                        " Result code = " + (grantResults.length > 0 ? grantResults[0] : "(empty)"));
                 finish();
             }
             break;
             case RC_PERMISSION_CAMERA: {
                 if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    Log.d(TAG, "Camera permission granted");
                     captureImage();
                     return;
                 }
-                Log.e(TAG, "Permission not granted: results len = " + grantResults.length +
-                        " Result code = " + (grantResults.length > 0 ? grantResults[0] : "(empty)"));
                 break;
             }
             default: {
-                Log.d(TAG, "Got unexpected permission result: " + requestCode);
                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-                break;
             }
         }
-    }
-
-    /**
-     * Open app settings screen
-     */
-    private void openAppSettings() {
-        Intent intent = new Intent(Settings.ACTION_APPLICATION_DETAILS_SETTINGS,
-                Uri.fromParts("package", getPackageName(), null));
-        intent.addFlags(Intent.FLAG_ACTIVITY_NEW_TASK);
-        startActivity(intent);
     }
 
     @Override
@@ -463,8 +374,8 @@ public class ImagePickerActivity extends AppCompatActivity
             if (rc == PackageManager.PERMISSION_GRANTED) {
                 captureImage();
             } else {
-                Log.w(TAG, "Camera permission is not granted. Requesting permission");
-                requestCameraPermission();
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
+                        RC_PERMISSION_CAMERA);
             }
         } else {
             captureImage();
