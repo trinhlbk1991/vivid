@@ -55,7 +55,6 @@ public class ImagePickerActivity extends AppCompatActivity
     }
 
     ActivityImagePickerBinding binding;
-    private ActionBar actionBar;
     private GridLayoutManager layoutManager;
     private GridSpacingItemDecoration itemOffsetDecoration;
     private ImagePickerAdapter imageAdapter;
@@ -92,8 +91,7 @@ public class ImagePickerActivity extends AppCompatActivity
 
     private void setupView() {
         setSupportActionBar(binding.toolbar);
-        actionBar = getSupportActionBar();
-
+        ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle(config.getFolderTitle());
             actionBar.setDisplayHomeAsUpEnabled(true);
@@ -416,15 +414,15 @@ public class ImagePickerActivity extends AppCompatActivity
         supportInvalidateOptionsMenu();
 
         if (isDisplayingFolderView()) {
-            actionBar.setTitle(config.getFolderTitle());
+            binding.toolbar.setTitle(config.getFolderTitle());
             return;
         }
 
         if (imageAdapter.getSelectedImages().isEmpty()) {
-            actionBar.setTitle(config.getImageTitle());
+            binding.toolbar.setTitle(config.getImageTitle());
         } else if (config.getMode() == ImagePicker.MULTIPLE) {
             int imageSize = imageAdapter.getSelectedImages().size();
-            actionBar.setTitle(config.getLimit() == ImagePicker.MAX_LIMIT
+            binding.toolbar.setTitle(config.getLimit() == ImagePicker.MAX_LIMIT
                     ? String.format(getString(R.string.ef_selected), imageSize)
                     : String.format(getString(R.string.ef_selected_with_limit), imageSize, config.getLimit()));
         }
