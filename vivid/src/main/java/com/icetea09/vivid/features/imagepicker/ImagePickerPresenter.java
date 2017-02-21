@@ -5,6 +5,7 @@ import android.content.Context;
 import android.content.Intent;
 import android.os.Handler;
 import android.os.Looper;
+import android.view.MenuItem;
 import android.widget.Toast;
 
 import com.icetea09.vivid.R;
@@ -18,16 +19,29 @@ import com.icetea09.vivid.model.Folder;
 import com.icetea09.vivid.model.Image;
 
 import java.io.File;
+import java.util.ArrayList;
 import java.util.List;
 
-public class ImagePickerPresenter extends BasePresenter<ImagePickerView> {
+import static com.icetea09.vivid.features.imagepicker.ImagePicker.SINGLE;
+
+public class ImagePickerPresenter extends BasePresenter<ImagePickerActivity> {
 
     private ImageLoader imageLoader;
     private CameraModule cameraModule = new DefaultCameraModule();
     private Handler handler = new Handler(Looper.getMainLooper());
+    private Configuration configuration;
+    private List<Image> selectedImages;
 
-    public ImagePickerPresenter(ImageLoader imageLoader) {
+    public ImagePickerPresenter(ImageLoader imageLoader, Configuration configuration) {
         this.imageLoader = imageLoader;
+        this.configuration = configuration;
+        this.selectedImages = new ArrayList<>();
+    }
+
+    @Override
+    public void attachView(ImagePickerActivity view) {
+        super.attachView(view);
+        view.setUpView(configuration.getFolderTitle());
     }
 
     public void abortLoad() {
@@ -39,7 +53,7 @@ public class ImagePickerPresenter extends BasePresenter<ImagePickerView> {
             return;
         }
 
-        getView().showLoading(true);
+        view.showLoading(true);
         imageLoader.loadDeviceImages(isFolderMode, new ImageLoaderListener() {
             @Override
             public void onImageLoaded(final List<Image> images, final List<Folder> folders) {
@@ -47,19 +61,19 @@ public class ImagePickerPresenter extends BasePresenter<ImagePickerView> {
                     @Override
                     public void run() {
                         if (isViewAttached()) {
-                            getView().showFetchCompleted(images, folders);
+                            view.showFetchCompleted(folders);
 
                             if (folders != null) {
                                 if (folders.isEmpty()) {
-                                    getView().showEmpty();
+                                    view.showEmpty();
                                 } else {
-                                    getView().showLoading(false);
+                                    view.showLoading(false);
                                 }
                             } else {
                                 if (images.isEmpty()) {
-                                    getView().showEmpty();
+                                    view.showEmpty();
                                 } else {
-                                    getView().showLoading(false);
+                                    view.showLoading(false);
                                 }
                             }
                         }
@@ -73,7 +87,7 @@ public class ImagePickerPresenter extends BasePresenter<ImagePickerView> {
                     @Override
                     public void run() {
                         if (isViewAttached()) {
-                            getView().showError(throwable);
+                            view.showError(throwable);
                         }
                     }
                 });
@@ -93,13 +107,13 @@ public class ImagePickerPresenter extends BasePresenter<ImagePickerView> {
                     i--;
                 }
             }
-            getView().finishPickImages(selectedImages);
+            view.finishPickImages(selectedImages);
         }
     }
 
-    public void captureImage(Activity activity, Configuration config, int requestCode) {
+    public void captureImage(Activity activity, int requestCode) {
         Context context = activity.getApplicationContext();
-        Intent intent = cameraModule.getCameraIntent(activity, config);
+        Intent intent = cameraModule.getCameraIntent(activity, configuration);
         if (intent == null) {
             Toast.makeText(context, context.getString(R.string.ef_error_create_image_file), Toast.LENGTH_LONG).show();
             return;
@@ -107,16 +121,52 @@ public class ImagePickerPresenter extends BasePresenter<ImagePickerView> {
         activity.startActivityForResult(intent, requestCode);
     }
 
-    public void finishCaptureImage(Context context, Intent data, final Configuration config) {
+    public void finishCaptureImage(Context context, Intent data) {
         cameraModule.getImage(context, data, new OnImageReadyListener() {
             @Override
             public void onImageReady(List<Image> images) {
-                if (config.isReturnAfterFirst()) {
-                    getView().finishPickImages(images);
+                if (configuration.isReturnAfterFirst()) {
+                    view.finishPickImages(images);
                 } else {
-                    getView().showCapturedImage();
+                    view.showCapturedImage();
                 }
             }
         });
+    }
+
+    public void updateMenuDoneVisibility(MenuItem menuDone) {
+        if (menuDone != null) {
+            menuDone.setVisible(!view.isDisplayingFolderView() && !selectedImages.isEmpty());
+            if (configuration.getMode() == SINGLE && configuration.isReturnAfterFirst()) {
+                menuDone.setVisible(false);
+            }
+        }
+    }
+
+    public void onImageClicked(int clickPosition, int selectedItemPosition, Image image) {
+        if (configuration.getMode() == ImagePicker.MULTIPLE) {
+            if (selectedItemPosition == -1) {
+                view.addImage(image, configuration.getLimit());
+            } else {
+                view.removeImage(selectedItemPosition, clickPosition);
+            }
+        } else {
+            if (selectedItemPosition != -1) {
+                view.removeImage(selectedItemPosition, clickPosition);
+            } else {
+                view.removeAllImages();
+                view.addImage(image, configuration.getLimit());
+
+                if (configuration.isReturnAfterFirst()) {
+                    view.onDone();
+                }
+            }
+        }
+        updateTitle();
+    }
+
+    private void updateTitle() {
+        String title = view.isDisplayingFolderView() ? configuration.getFolderTitle() : configuration.getImageTitle();
+        view.updateTitle(title, configuration.getMode(), configuration.getLimit());
     }
 }

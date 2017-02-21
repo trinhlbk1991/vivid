@@ -40,8 +40,7 @@ import static com.icetea09.vivid.features.imagepicker.ImagePicker.EXTRA_SELECTED
 import static com.icetea09.vivid.features.imagepicker.ImagePicker.MULTIPLE;
 import static com.icetea09.vivid.features.imagepicker.ImagePicker.SINGLE;
 
-public class ImagePickerActivity extends AppCompatActivity
-        implements ImagePickerView, OnImageClickListener {
+public class ImagePickerActivity extends AppCompatActivity implements OnImageClickListener {
 
     private static final String TAG = ImagePickerActivity.class.getSimpleName();
     private static final int RC_CAPTURE = 2000;
@@ -61,7 +60,6 @@ public class ImagePickerActivity extends AppCompatActivity
     private FolderPickerAdapter folderAdapter;
 
     private ImagePickerPresenter presenter;
-    private Configuration config;
 
     private Handler handler;
     private ContentObserver observer;
@@ -81,44 +79,27 @@ public class ImagePickerActivity extends AppCompatActivity
             return;
         }
 
-        presenter = new ImagePickerPresenter(new ImageLoader(this));
+        Bundle bundle = intent.getExtras();
+        Configuration config = bundle.getParcelable(Configuration.class.getSimpleName());
+        config = config != null ? config : Configuration.create(this, intent);
+        presenter = new ImagePickerPresenter(new ImageLoader(this), config);
         presenter.attachView(this);
 
-        setupExtras();
-        setupView();
         orientationBasedUI(getResources().getConfiguration().orientation);
     }
 
-    private void setupView() {
+    public void setUpView(String title) {
         setSupportActionBar(binding.toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
-            actionBar.setTitle(config.getFolderTitle());
+            actionBar.setTitle(title);
             actionBar.setDisplayHomeAsUpEnabled(true);
             actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back);
             actionBar.setDisplayShowTitleEnabled(true);
         }
-    }
-
-    private void setupExtras() {
-        Intent intent = getIntent();
-        Bundle bundle = intent.getExtras();
-
-        config = bundle.getParcelable(Configuration.class.getSimpleName());
-        if (config == null) {
-            config = Configuration.create(this, intent);
-        }
-
-        ArrayList<Image> selectedImages = null;
-        if (config.getMode() == MULTIPLE && !config.getSelectedImages().isEmpty()) {
-            selectedImages = config.getSelectedImages();
-        }
-        if (selectedImages == null) {
-            selectedImages = new ArrayList<>();
-        }
 
         /** Init folder and image adapter */
-        imageAdapter = new ImagePickerAdapter(this, selectedImages, this);
+        imageAdapter = new ImagePickerAdapter(this, null, this);
         folderAdapter = new FolderPickerAdapter(this, new OnFolderClickListener() {
             @Override
             public void onFolderClick(Folder bucket) {
@@ -144,7 +125,6 @@ public class ImagePickerActivity extends AppCompatActivity
         imageAdapter.setData(images);
         setItemDecoration(imageColumns);
         binding.recyclerView.setAdapter(imageAdapter);
-        updateTitle();
     }
 
     /**
@@ -164,7 +144,6 @@ public class ImagePickerActivity extends AppCompatActivity
             layoutManager.setSpanCount(folderColumns);
             binding.recyclerView.getLayoutManager().onRestoreInstanceState(foldersState);
         }
-        updateTitle();
     }
 
     /**
@@ -179,13 +158,7 @@ public class ImagePickerActivity extends AppCompatActivity
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         MenuItem menuDone = menu.findItem(R.id.menu_done);
-        if (menuDone != null) {
-            menuDone.setVisible(!isDisplayingFolderView() && !imageAdapter.getSelectedImages().isEmpty());
-
-            if (config.getMode() == SINGLE && config.isReturnAfterFirst()) {
-                menuDone.setVisible(false);
-            }
-        }
+        presenter.updateMenuDoneVisibility(menuDone);
         return super.onPrepareOptionsMenu(menu);
     }
 
@@ -195,18 +168,12 @@ public class ImagePickerActivity extends AppCompatActivity
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         int id = item.getItemId();
-
         if (id == android.R.id.home) {
             onBackPressed();
-            return true;
-        }
-        if (id == R.id.menu_done) {
+        } else if (id == R.id.menu_done) {
             onDone();
-            return true;
-        }
-        if (id == R.id.menu_camera) {
+        } else if (id == R.id.menu_camera) {
             captureImageWithPermission();
-            return true;
         }
         return super.onOptionsItemSelected(item);
     }
@@ -215,7 +182,7 @@ public class ImagePickerActivity extends AppCompatActivity
      * On finish selected image
      * Get all selected images then return image to caller activity
      */
-    private void onDone() {
+    public void onDone() {
         List<Image> selectedImages = imageAdapter.getSelectedImages();
         presenter.onDoneSelectImages(selectedImages);
     }
@@ -311,31 +278,7 @@ public class ImagePickerActivity extends AppCompatActivity
     private void clickImage(int position) {
         Image image = imageAdapter.getItem(position);
         int selectedItemPosition = selectedImagePosition(image);
-        if (config.getMode() == ImagePicker.MULTIPLE) {
-            if (selectedItemPosition == -1) {
-                if (imageAdapter.getSelectedImages().size() < config.getLimit()) {
-                    imageAdapter.addSelected(image);
-                } else {
-                    Toast.makeText(this, R.string.ef_msg_limit_images, Toast.LENGTH_SHORT).show();
-                }
-            } else {
-                imageAdapter.removeSelectedPosition(selectedItemPosition, position);
-            }
-        } else {
-            if (selectedItemPosition != -1) {
-                imageAdapter.removeSelectedPosition(selectedItemPosition, position);
-            } else {
-                if (imageAdapter.getSelectedImages().size() > 0) {
-                    imageAdapter.removeAllSelectedSingleClick();
-                }
-                imageAdapter.addSelected(image);
-
-                if (config.isReturnAfterFirst()) {
-                    onDone();
-                }
-            }
-        }
-        updateTitle();
+        presenter.onImageClicked(position, selectedItemPosition, image);
     }
 
     private int selectedImagePosition(Image image) {
@@ -356,7 +299,7 @@ public class ImagePickerActivity extends AppCompatActivity
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_CAPTURE && resultCode == RESULT_OK) {
-            presenter.finishCaptureImage(this, data, config);
+            presenter.finishCaptureImage(this, data);
         }
     }
 
@@ -385,7 +328,7 @@ public class ImagePickerActivity extends AppCompatActivity
         if (!CameraHelper.checkCameraAvailability(this)) {
             return;
         }
-        presenter.captureImage(this, config, RC_CAPTURE);
+        presenter.captureImage(this, RC_CAPTURE);
     }
 
 
@@ -410,21 +353,15 @@ public class ImagePickerActivity extends AppCompatActivity
      * If we're displaying folder, set folder title
      * If we're displaying images, show number of selected images
      */
-    private void updateTitle() {
+    public void updateTitle(String title, int mode, int limit) {
         supportInvalidateOptionsMenu();
 
-        if (isDisplayingFolderView()) {
-            binding.toolbar.setTitle(config.getFolderTitle());
-            return;
-        }
-
-        if (imageAdapter.getSelectedImages().isEmpty()) {
-            binding.toolbar.setTitle(config.getImageTitle());
-        } else if (config.getMode() == ImagePicker.MULTIPLE) {
+        binding.toolbar.setTitle(title);
+        if (!isDisplayingFolderView() && mode == ImagePicker.MULTIPLE) {
             int imageSize = imageAdapter.getSelectedImages().size();
-            binding.toolbar.setTitle(config.getLimit() == ImagePicker.MAX_LIMIT
+            binding.toolbar.setTitle(limit == ImagePicker.MAX_LIMIT
                     ? String.format(getString(R.string.ef_selected), imageSize)
-                    : String.format(getString(R.string.ef_selected_with_limit), imageSize, config.getLimit()));
+                    : String.format(getString(R.string.ef_selected_with_limit), imageSize, limit));
         }
     }
 
@@ -450,7 +387,7 @@ public class ImagePickerActivity extends AppCompatActivity
     /**
      * Check if displaying folders view
      */
-    private boolean isDisplayingFolderView() {
+    public boolean isDisplayingFolderView() {
         return ((binding.recyclerView.getAdapter() == null || binding.recyclerView.getAdapter() instanceof FolderPickerAdapter));
     }
 
@@ -467,7 +404,6 @@ public class ImagePickerActivity extends AppCompatActivity
         super.onBackPressed();
     }
 
-    @Override
     public void finishPickImages(List<Image> images) {
         Intent data = new Intent();
         data.putParcelableArrayListExtra(EXTRA_SELECTED_IMAGES,
@@ -476,17 +412,14 @@ public class ImagePickerActivity extends AppCompatActivity
         finish();
     }
 
-    @Override
     public void showCapturedImage() {
         getDataWithPermission();
     }
 
-    @Override
-    public void showFetchCompleted(List<Image> images, List<Folder> folders) {
+    public void showFetchCompleted(List<Folder> folders) {
         setFolderAdapter(folders);
     }
 
-    @Override
     public void showError(Throwable throwable) {
         String message = "Unknown Error";
         if (throwable != null && throwable instanceof NullPointerException) {
@@ -495,18 +428,31 @@ public class ImagePickerActivity extends AppCompatActivity
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 
-    @Override
     public void showLoading(boolean isLoading) {
         binding.progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
         binding.recyclerView.setVisibility(isLoading ? View.GONE : View.VISIBLE);
         binding.tvEmptyImages.setVisibility(View.GONE);
     }
 
-    @Override
     public void showEmpty() {
         binding.progressBar.setVisibility(View.GONE);
         binding.recyclerView.setVisibility(View.GONE);
         binding.tvEmptyImages.setVisibility(View.VISIBLE);
     }
 
+    public void addImage(Image image, int limit) {
+        if (imageAdapter.getSelectedImages().size() < limit) {
+            imageAdapter.addSelected(image);
+        } else {
+            Toast.makeText(this, R.string.ef_msg_limit_images, Toast.LENGTH_SHORT).show();
+        }
+    }
+
+    public void removeImage(int selectedItemPosition, int clickPosition) {
+        imageAdapter.removeSelectedPosition(selectedItemPosition, clickPosition);
+    }
+
+    public void removeAllImages() {
+        imageAdapter.removeAllSelectedSingleClick();
+    }
 }

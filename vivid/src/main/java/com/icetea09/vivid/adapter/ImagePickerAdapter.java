@@ -28,6 +28,7 @@ public class ImagePickerAdapter extends RecyclerView.Adapter<ImagePickerAdapter.
 
     public ImagePickerAdapter(Context context, List<Image> selectedImages, OnImageClickListener itemClickListener) {
         this.context = context;
+        selectedImages = selectedImages != null ? selectedImages : new ArrayList<Image>();
         this.selectedImages = selectedImages;
         this.itemClickListener = itemClickListener;
         inflater = LayoutInflater.from(this.context);
@@ -111,7 +112,7 @@ public class ImagePickerAdapter extends RecyclerView.Adapter<ImagePickerAdapter.
         return images.get(position);
     }
 
-    public List<Image> getSelectedImages(){
+    public List<Image> getSelectedImages() {
         return selectedImages;
     }
 
