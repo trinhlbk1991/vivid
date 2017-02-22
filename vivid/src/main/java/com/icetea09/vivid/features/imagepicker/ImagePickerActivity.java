@@ -84,25 +84,16 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
         orientationBasedUI(getResources().getConfiguration().orientation);
     }
 
-    public void setUpView(String title) {
-        setSupportActionBar(binding.toolbar);
-        ActionBar actionBar = getSupportActionBar();
-        if (actionBar != null) {
-            actionBar.setTitle(title);
-            actionBar.setDisplayHomeAsUpEnabled(true);
-            actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back);
-            actionBar.setDisplayShowTitleEnabled(true);
-        }
-
-        /** Init folder and image adapter */
-        imageAdapter = new ImagePickerAdapter(this, this);
-        folderAdapter = new FolderPickerAdapter(this, new OnFolderClickListener() {
+    @Override
+    protected void onStart() {
+        super.onStart();
+        observer = new ContentObserver(new Handler()) {
             @Override
-            public void onFolderClick(Folder folder) {
-                foldersState = binding.recyclerView.getLayoutManager().onSaveInstanceState();
-                setImageAdapter(folder.getImages());
+            public void onChange(boolean selfChange) {
+                getData();
             }
-        });
+        };
+        getContentResolver().registerContentObserver(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, false, observer);
     }
 
     @Override
@@ -111,34 +102,17 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
         getDataWithPermission();
     }
 
-    /**
-     * Set image adapter
-     * 1. Set new data
-     * 2. Update item decoration
-     * 3. Update title
-     */
-    private void setImageAdapter(List<Image> images) {
-        imageAdapter.setData(images);
-        setItemDecoration(imageColumns);
-        binding.recyclerView.setAdapter(imageAdapter);
-    }
-
-    /**
-     * Set folder adapter
-     * 1. Set new data
-     * 2. Update item decoration
-     * 3. Update title
-     */
-    private void setFolderAdapter(List<Folder> folders) {
-        if (folders != null) {
-            folderAdapter.setData(folders);
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (presenter != null) {
+            presenter.abortLoad();
+            presenter.detachView();
         }
-        setItemDecoration(folderColumns);
-        binding.recyclerView.setAdapter(folderAdapter);
 
-        if (foldersState != null) {
-            layoutManager.setSpanCount(folderColumns);
-            binding.recyclerView.getLayoutManager().onRestoreInstanceState(foldersState);
+        if (observer != null) {
+            getContentResolver().unregisterContentObserver(observer);
+            observer = null;
         }
     }
 
@@ -174,7 +148,6 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
         return super.onOptionsItemSelected(item);
     }
 
-
     /**
      * Config recyclerView when configuration changed
      */
@@ -182,50 +155,6 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
     public void onConfigurationChanged(android.content.res.Configuration newConfig) {
         super.onConfigurationChanged(newConfig);
         orientationBasedUI(newConfig.orientation);
-    }
-
-    /**
-     * Set item size, column size base on the screen orientation
-     */
-    private void orientationBasedUI(int orientation) {
-        imageColumns = orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT ? 3 : 5;
-        folderColumns = orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT ? 2 : 4;
-
-        int columns = isDisplayingFolderView() ? folderColumns : imageColumns;
-        layoutManager = new GridLayoutManager(this, columns);
-        binding.recyclerView.setLayoutManager(layoutManager);
-        binding.recyclerView.setHasFixedSize(true);
-        setItemDecoration(columns);
-    }
-
-    /**
-     * Set item decoration
-     */
-    private void setItemDecoration(int columns) {
-        layoutManager.setSpanCount(columns);
-        if (itemOffsetDecoration != null)
-            binding.recyclerView.removeItemDecoration(itemOffsetDecoration);
-        itemOffsetDecoration = new GridSpacingItemDecoration(columns, getResources().getDimensionPixelSize(R.dimen.ef_item_padding), false);
-        binding.recyclerView.addItemDecoration(itemOffsetDecoration);
-    }
-
-
-    /**
-     * Check permission
-     */
-    private void getDataWithPermission() {
-        int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
-        if (rc == PackageManager.PERMISSION_GRANTED) {
-            getData();
-        } else {
-            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
-                    RC_PERMISSION_WRITE_EXTERNAL_STORAGE);
-        }
-    }
-
-    private void getData() {
-        presenter.abortLoad();
-        presenter.loadImages(true);
     }
 
     /**
@@ -256,17 +185,6 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
     }
 
     @Override
-    public void onClick(View view, int position) {
-        // Handle image selection event: add or remove selected image, change title
-        Image image = imageAdapter.getItem(position);
-        presenter.handleImageClick(position, image);
-    }
-
-    /**
-     * Check if the captured image is stored successfully
-     * Then reload data
-     */
-    @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if (requestCode == RC_CAPTURE && resultCode == RESULT_OK) {
@@ -274,45 +192,49 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
         }
     }
 
-    /**
-     * Request for camera permission
-     */
-    private void captureImageWithPermission() {
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
-            int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
-            if (rc == PackageManager.PERMISSION_GRANTED) {
-                captureImage();
-            } else {
-                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
-                        RC_PERMISSION_CAMERA);
-            }
-        } else {
-            captureImage();
-        }
+    @Override
+    public void onClick(View view, int position) {
+        Image image = imageAdapter.getItem(position);
+        presenter.handleImageClick(position, image);
     }
 
+
     /**
-     * Start camera intent
-     * Create a temporary file and pass file Uri to camera intent
+     * When press back button, show folders if view is displaying images
      */
-    private void captureImage() {
-        if (!CameraHelper.checkCameraAvailability(this)) {
+    @Override
+    public void onBackPressed() {
+        if (!isDisplayingFolderView()) {
+            setFolderAdapter(null);
             return;
         }
-        presenter.captureImage(this, RC_CAPTURE);
+        setResult(RESULT_CANCELED);
+        super.onBackPressed();
     }
 
 
-    @Override
-    protected void onStart() {
-        super.onStart();
-        observer = new ContentObserver(new Handler()) {
+
+
+
+    public void setUpView(String title) {
+        setSupportActionBar(binding.toolbar);
+        ActionBar actionBar = getSupportActionBar();
+        if (actionBar != null) {
+            actionBar.setTitle(title);
+            actionBar.setDisplayHomeAsUpEnabled(true);
+            actionBar.setHomeAsUpIndicator(R.drawable.ic_arrow_back);
+            actionBar.setDisplayShowTitleEnabled(true);
+        }
+
+        /** Init folder and image adapter */
+        imageAdapter = new ImagePickerAdapter(this, this);
+        folderAdapter = new FolderPickerAdapter(this, new OnFolderClickListener() {
             @Override
-            public void onChange(boolean selfChange) {
-                getData();
+            public void onFolderClick(Folder folder) {
+                foldersState = binding.recyclerView.getLayoutManager().onSaveInstanceState();
+                setImageAdapter(folder.getImages());
             }
-        };
-        getContentResolver().registerContentObserver(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, false, observer);
+        });
     }
 
     /**
@@ -330,38 +252,11 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
         }
     }
 
-    @Override
-    protected void onDestroy() {
-        super.onDestroy();
-        if (presenter != null) {
-            presenter.abortLoad();
-            presenter.detachView();
-        }
-
-        if (observer != null) {
-            getContentResolver().unregisterContentObserver(observer);
-            observer = null;
-        }
-    }
-
     /**
      * Check if displaying folders view
      */
     public boolean isDisplayingFolderView() {
         return ((binding.recyclerView.getAdapter() == null || binding.recyclerView.getAdapter() instanceof FolderPickerAdapter));
-    }
-
-    /**
-     * When press back button, show folders if view is displaying images
-     */
-    @Override
-    public void onBackPressed() {
-        if (!isDisplayingFolderView()) {
-            setFolderAdapter(null);
-            return;
-        }
-        setResult(RESULT_CANCELED);
-        super.onBackPressed();
     }
 
     public void finishPickImages(List<Image> images) {
@@ -412,4 +307,107 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
     public void removeAllImages() {
         imageAdapter.removeAllSelectedSingleClick();
     }
+
+    /**
+     * Set image adapter
+     * 1. Set new data
+     * 2. Update item decoration
+     * 3. Update title
+     */
+    private void setImageAdapter(List<Image> images) {
+        imageAdapter.setData(images);
+        setItemDecoration(imageColumns);
+        binding.recyclerView.setAdapter(imageAdapter);
+    }
+
+    /**
+     * Set folder adapter
+     * 1. Set new data
+     * 2. Update item decoration
+     * 3. Update title
+     */
+    private void setFolderAdapter(List<Folder> folders) {
+        if (folders != null) {
+            folderAdapter.setData(folders);
+        }
+        setItemDecoration(folderColumns);
+        binding.recyclerView.setAdapter(folderAdapter);
+
+        if (foldersState != null) {
+            layoutManager.setSpanCount(folderColumns);
+            binding.recyclerView.getLayoutManager().onRestoreInstanceState(foldersState);
+        }
+    }
+
+    /**
+     * Set item size, column size base on the screen orientation
+     */
+    private void orientationBasedUI(int orientation) {
+        imageColumns = orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT ? 3 : 5;
+        folderColumns = orientation == android.content.res.Configuration.ORIENTATION_PORTRAIT ? 2 : 4;
+
+        int columns = isDisplayingFolderView() ? folderColumns : imageColumns;
+        layoutManager = new GridLayoutManager(this, columns);
+        binding.recyclerView.setLayoutManager(layoutManager);
+        binding.recyclerView.setHasFixedSize(true);
+        setItemDecoration(columns);
+    }
+
+    /**
+     * Set item decoration
+     */
+    private void setItemDecoration(int columns) {
+        layoutManager.setSpanCount(columns);
+        if (itemOffsetDecoration != null)
+            binding.recyclerView.removeItemDecoration(itemOffsetDecoration);
+        itemOffsetDecoration = new GridSpacingItemDecoration(columns, getResources().getDimensionPixelSize(R.dimen.ef_item_padding), false);
+        binding.recyclerView.addItemDecoration(itemOffsetDecoration);
+    }
+
+    /**
+     * Check permission
+     */
+    private void getDataWithPermission() {
+        int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
+        if (rc == PackageManager.PERMISSION_GRANTED) {
+            getData();
+        } else {
+            ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
+                    RC_PERMISSION_WRITE_EXTERNAL_STORAGE);
+        }
+    }
+
+    private void getData() {
+        presenter.abortLoad();
+        presenter.loadImages(true);
+    }
+
+    /**
+     * Request for camera permission
+     */
+    private void captureImageWithPermission() {
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.M) {
+            int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.CAMERA);
+            if (rc == PackageManager.PERMISSION_GRANTED) {
+                captureImage();
+            } else {
+                ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.CAMERA},
+                        RC_PERMISSION_CAMERA);
+            }
+        } else {
+            captureImage();
+        }
+    }
+
+    /**
+     * Start camera intent
+     * Create a temporary file and pass file Uri to camera intent
+     */
+    private void captureImage() {
+        if (!CameraHelper.checkCameraAvailability(this)) {
+            return;
+        }
+        presenter.captureImage(this, RC_CAPTURE);
+    }
+
 }
