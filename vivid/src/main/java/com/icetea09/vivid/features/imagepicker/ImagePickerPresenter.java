@@ -156,12 +156,12 @@ public class ImagePickerPresenter extends BasePresenter<ImagePickerActivity> {
                 }
             } else {
                 selectedImages.remove(selectedItemPosition);
-                view.removeImage(selectedItemPosition, clickPosition);
+                view.removeImage(image, clickPosition);
                 updateTitle();
             }
         } else {
             if (selectedItemPosition != -1) {
-                view.removeImage(selectedItemPosition, clickPosition);
+                view.removeImage(image, clickPosition);
             } else {
                 selectedImages.clear();
                 view.removeAllImages();

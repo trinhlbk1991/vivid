@@ -67,29 +67,17 @@ public class ImagePickerAdapter extends RecyclerView.Adapter<ImagePickerAdapter.
         this.images.addAll(images);
     }
 
-    public void addAll(List<Image> images) {
-        int startIndex = this.images.size();
-        this.images.addAll(startIndex, images);
-        notifyItemRangeInserted(startIndex, images.size());
-    }
-
     public void addSelected(Image image) {
         image.setSelected(true);
         notifyItemChanged(images.indexOf(image));
     }
 
-    public void removeSelectedImage(Image image) {
+    public void removeSelectedPosition(Image image, int clickPosition) {
         image.setSelected(false);
-        notifyItemChanged(images.indexOf(image));
-    }
-
-    public void removeSelectedPosition(int position, int clickPosition) {
-        //selectedImages.remove(position);
         notifyItemChanged(clickPosition);
     }
 
     public void removeAllSelectedSingleClick() {
-        //selectedImages.clear();
         notifyDataSetChanged();
     }
 

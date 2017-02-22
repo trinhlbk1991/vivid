@@ -418,8 +418,8 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
         Toast.makeText(this, R.string.ef_msg_limit_images, Toast.LENGTH_SHORT).show();
     }
 
-    public void removeImage(int selectedItemPosition, int clickPosition) {
-        imageAdapter.removeSelectedPosition(selectedItemPosition, clickPosition);
+    public void removeImage(Image image, int clickPosition) {
+        imageAdapter.removeSelectedPosition(image, clickPosition);
     }
 
     public void removeAllImages() {
