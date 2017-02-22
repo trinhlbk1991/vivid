@@ -37,8 +37,6 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static com.icetea09.vivid.features.imagepicker.ImagePicker.EXTRA_SELECTED_IMAGES;
-import static com.icetea09.vivid.features.imagepicker.ImagePicker.MULTIPLE;
-import static com.icetea09.vivid.features.imagepicker.ImagePicker.SINGLE;
 
 public class ImagePickerActivity extends AppCompatActivity implements OnImageClickListener {
 
@@ -84,7 +82,6 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
         config = config != null ? config : Configuration.create(this, intent);
         presenter = new ImagePickerPresenter(new ImageLoader(this), config);
         presenter.attachView(this);
-
         orientationBasedUI(getResources().getConfiguration().orientation);
     }
 
@@ -99,7 +96,7 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
         }
 
         /** Init folder and image adapter */
-        imageAdapter = new ImagePickerAdapter(this, null, this);
+        imageAdapter = new ImagePickerAdapter(this, this);
         folderAdapter = new FolderPickerAdapter(this, new OnFolderClickListener() {
             @Override
             public void onFolderClick(Folder bucket) {
@@ -171,21 +168,13 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
         if (id == android.R.id.home) {
             onBackPressed();
         } else if (id == R.id.menu_done) {
-            onDone();
+            presenter.onDoneSelectImages();
         } else if (id == R.id.menu_camera) {
             captureImageWithPermission();
         }
         return super.onOptionsItemSelected(item);
     }
 
-    /**
-     * On finish selected image
-     * Get all selected images then return image to caller activity
-     */
-    public void onDone() {
-        List<Image> selectedImages = imageAdapter.getSelectedImages();
-        presenter.onDoneSelectImages(selectedImages);
-    }
 
     /**
      * Config recyclerView when configuration changed
@@ -269,26 +258,9 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
 
     @Override
     public void onClick(View view, int position) {
-        clickImage(position);
-    }
-
-    /**
-     * Handle image selection event: add or remove selected image, change title
-     */
-    private void clickImage(int position) {
+        // Handle image selection event: add or remove selected image, change title
         Image image = imageAdapter.getItem(position);
-        int selectedItemPosition = selectedImagePosition(image);
-        presenter.onImageClicked(position, selectedItemPosition, image);
-    }
-
-    private int selectedImagePosition(Image image) {
-        List<Image> selectedImages = imageAdapter.getSelectedImages();
-        for (int i = 0; i < selectedImages.size(); i++) {
-            if (selectedImages.get(i).getPath().equals(image.getPath())) {
-                return i;
-            }
-        }
-        return -1;
+        presenter.handleImageClick(position, image);
     }
 
     /**
@@ -353,15 +325,13 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
      * If we're displaying folder, set folder title
      * If we're displaying images, show number of selected images
      */
-    public void updateTitle(String title, int mode, int limit) {
+    public void updateTitle(String title, int mode, int noSelectedImages, int limit) {
         supportInvalidateOptionsMenu();
-
         binding.toolbar.setTitle(title);
         if (!isDisplayingFolderView() && mode == ImagePicker.MULTIPLE) {
-            int imageSize = imageAdapter.getSelectedImages().size();
             binding.toolbar.setTitle(limit == ImagePicker.MAX_LIMIT
-                    ? String.format(getString(R.string.ef_selected), imageSize)
-                    : String.format(getString(R.string.ef_selected_with_limit), imageSize, limit));
+                    ? String.format(getString(R.string.ef_selected), noSelectedImages)
+                    : String.format(getString(R.string.ef_selected_with_limit), noSelectedImages, limit));
         }
     }
 
@@ -440,12 +410,12 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
         binding.tvEmptyImages.setVisibility(View.VISIBLE);
     }
 
-    public void addImage(Image image, int limit) {
-        if (imageAdapter.getSelectedImages().size() < limit) {
-            imageAdapter.addSelected(image);
-        } else {
-            Toast.makeText(this, R.string.ef_msg_limit_images, Toast.LENGTH_SHORT).show();
-        }
+    public void updateSelectedImage(Image image) {
+        imageAdapter.addSelected(image);
+    }
+
+    public void showErrorExceedLimit() {
+        Toast.makeText(this, R.string.ef_msg_limit_images, Toast.LENGTH_SHORT).show();
     }
 
     public void removeImage(int selectedItemPosition, int clickPosition) {

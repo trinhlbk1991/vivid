@@ -95,7 +95,7 @@ public class ImagePickerPresenter extends BasePresenter<ImagePickerActivity> {
         });
     }
 
-    public void onDoneSelectImages(List<Image> selectedImages) {
+    public void onDoneSelectImages() {
         if (selectedImages != null && selectedImages.size() > 0) {
 
             /** Scan selected images which not existed */
@@ -143,22 +143,34 @@ public class ImagePickerPresenter extends BasePresenter<ImagePickerActivity> {
         }
     }
 
-    public void onImageClicked(int clickPosition, int selectedItemPosition, Image image) {
+    public void handleImageClick(int clickPosition, Image image) {
+        int selectedItemPosition = selectedImagePosition(image);
         if (configuration.getMode() == ImagePicker.MULTIPLE) {
             if (selectedItemPosition == -1) {
-                view.addImage(image, configuration.getLimit());
+                if (selectedImages.size() < configuration.getLimit()) {
+                    selectedImages.add(image);
+                    view.updateSelectedImage(image);
+                    updateTitle();
+                } else {
+                    view.showErrorExceedLimit();
+                }
             } else {
+                selectedImages.remove(selectedItemPosition);
                 view.removeImage(selectedItemPosition, clickPosition);
+                updateTitle();
             }
         } else {
             if (selectedItemPosition != -1) {
                 view.removeImage(selectedItemPosition, clickPosition);
             } else {
+                selectedImages.clear();
                 view.removeAllImages();
-                view.addImage(image, configuration.getLimit());
+                selectedImages.add(image);
+                view.updateSelectedImage(image);
+                updateTitle();
 
                 if (configuration.isReturnAfterFirst()) {
-                    view.onDone();
+                    view.finishPickImages(selectedImages);
                 }
             }
         }
@@ -167,6 +179,16 @@ public class ImagePickerPresenter extends BasePresenter<ImagePickerActivity> {
 
     private void updateTitle() {
         String title = view.isDisplayingFolderView() ? configuration.getFolderTitle() : configuration.getImageTitle();
-        view.updateTitle(title, configuration.getMode(), configuration.getLimit());
+        view.updateTitle(title, configuration.getMode(), selectedImages.size(), configuration.getLimit());
     }
+
+    private int selectedImagePosition(Image image) {
+        for (int i = 0; i < selectedImages.size(); i++) {
+            if (selectedImages.get(i).getPath().equals(image.getPath())) {
+                return i;
+            }
+        }
+        return -1;
+    }
+
 }

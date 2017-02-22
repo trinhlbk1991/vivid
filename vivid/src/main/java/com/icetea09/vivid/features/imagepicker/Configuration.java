@@ -22,7 +22,6 @@ import static com.icetea09.vivid.features.imagepicker.ImagePicker.MULTIPLE;
 
 public class Configuration implements Parcelable {
 
-    private ArrayList<Image> selectedImages;
     private String folderTitle;
     private String imageTitle;
     private String capturedImageDirectory;
@@ -36,7 +35,6 @@ public class Configuration implements Parcelable {
         config.setLimit(intent.getIntExtra(EXTRA_LIMIT, MAX_LIMIT));
         config.setFolderTitle(intent.getStringExtra(EXTRA_FOLDER_TITLE));
         config.setImageTitle(intent.getStringExtra(EXTRA_IMAGE_TITLE));
-        config.setSelectedImages(intent.<Image>getParcelableArrayListExtra(EXTRA_SELECTED_IMAGES));
         config.setCapturedImageDirectory(intent.getStringExtra(EXTRA_IMAGE_DIRECTORY));
         config.setReturnAfterFirst(intent.getBooleanExtra(EXTRA_RETURN_AFTER_FIRST, false));
         return config;
@@ -47,7 +45,6 @@ public class Configuration implements Parcelable {
         this.limit = ImagePicker.MAX_LIMIT;
         this.folderTitle = context.getString(R.string.ef_title_folder);
         this.imageTitle = context.getString(R.string.ef_title_select_image);
-        this.selectedImages = new ArrayList<>();
         this.capturedImageDirectory = context.getString(R.string.ef_image_directory);
         this.returnAfterFirst = true;
     }
@@ -92,14 +89,6 @@ public class Configuration implements Parcelable {
         this.imageTitle = imageTitle;
     }
 
-    public ArrayList<Image> getSelectedImages() {
-        return selectedImages;
-    }
-
-    public void setSelectedImages(ArrayList<Image> selectedImages) {
-        this.selectedImages = selectedImages;
-    }
-
     public String getCapturedImageDirectory() {
         return capturedImageDirectory;
     }
@@ -115,7 +104,6 @@ public class Configuration implements Parcelable {
 
     @Override
     public void writeToParcel(Parcel dest, int flags) {
-        dest.writeTypedList(this.selectedImages);
         dest.writeString(this.folderTitle);
         dest.writeString(this.imageTitle);
         dest.writeString(this.capturedImageDirectory);
@@ -125,7 +113,6 @@ public class Configuration implements Parcelable {
     }
 
     protected Configuration(Parcel in) {
-        this.selectedImages = in.createTypedArrayList(Image.CREATOR);
         this.folderTitle = in.readString();
         this.imageTitle = in.readString();
         this.capturedImageDirectory = in.readString();

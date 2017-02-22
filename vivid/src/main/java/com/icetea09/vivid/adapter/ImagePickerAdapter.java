@@ -20,16 +20,13 @@ import java.util.List;
 public class ImagePickerAdapter extends RecyclerView.Adapter<ImagePickerAdapter.ImageViewHolder> {
 
     private List<Image> images = new ArrayList<>();
-    private List<Image> selectedImages;
 
     private Context context;
     private LayoutInflater inflater;
     private OnImageClickListener itemClickListener;
 
-    public ImagePickerAdapter(Context context, List<Image> selectedImages, OnImageClickListener itemClickListener) {
+    public ImagePickerAdapter(Context context, OnImageClickListener itemClickListener) {
         this.context = context;
-        selectedImages = selectedImages != null ? selectedImages : new ArrayList<Image>();
-        this.selectedImages = selectedImages;
         this.itemClickListener = itemClickListener;
         inflater = LayoutInflater.from(this.context);
     }
@@ -42,16 +39,14 @@ public class ImagePickerAdapter extends RecyclerView.Adapter<ImagePickerAdapter.
 
     @Override
     public void onBindViewHolder(ImageViewHolder viewHolder, int position) {
-
         Image image = images.get(position);
-
         Glide.with(context)
                 .load(image.getPath())
                 .placeholder(R.drawable.image_placeholder)
                 .error(R.drawable.image_placeholder)
                 .into(viewHolder.imageView);
 
-        if (isSelected(image)) {
+        if (image.isSelected()) {
             viewHolder.alphaView.setAlpha(0.5f);
             ((FrameLayout) viewHolder.itemView).setForeground(ContextCompat.getDrawable(context, R.drawable.ic_done_white));
         } else {
@@ -59,16 +54,6 @@ public class ImagePickerAdapter extends RecyclerView.Adapter<ImagePickerAdapter.
             ((FrameLayout) viewHolder.itemView).setForeground(null);
         }
 
-    }
-
-    private boolean isSelected(Image image) {
-        for (Image selectedImage : selectedImages) {
-            if (selectedImage.getPath().equals(image.getPath())) {
-                return true;
-            }
-        }
-
-        return false;
     }
 
     @Override
@@ -89,31 +74,27 @@ public class ImagePickerAdapter extends RecyclerView.Adapter<ImagePickerAdapter.
     }
 
     public void addSelected(Image image) {
-        selectedImages.add(image);
+        image.setSelected(true);
         notifyItemChanged(images.indexOf(image));
     }
 
     public void removeSelectedImage(Image image) {
-        selectedImages.remove(image);
+        image.setSelected(false);
         notifyItemChanged(images.indexOf(image));
     }
 
     public void removeSelectedPosition(int position, int clickPosition) {
-        selectedImages.remove(position);
+        //selectedImages.remove(position);
         notifyItemChanged(clickPosition);
     }
 
     public void removeAllSelectedSingleClick() {
-        selectedImages.clear();
+        //selectedImages.clear();
         notifyDataSetChanged();
     }
 
     public Image getItem(int position) {
         return images.get(position);
-    }
-
-    public List<Image> getSelectedImages() {
-        return selectedImages;
     }
 
     public static class ImageViewHolder extends RecyclerView.ViewHolder implements View.OnClickListener {
