@@ -99,9 +99,9 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
         imageAdapter = new ImagePickerAdapter(this, this);
         folderAdapter = new FolderPickerAdapter(this, new OnFolderClickListener() {
             @Override
-            public void onFolderClick(Folder bucket) {
+            public void onFolderClick(Folder folder) {
                 foldersState = binding.recyclerView.getLayoutManager().onSaveInstanceState();
-                setImageAdapter(bucket.getImages());
+                setImageAdapter(folder.getImages());
             }
         });
     }
@@ -391,10 +391,7 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
     }
 
     public void showError(Throwable throwable) {
-        String message = "Unknown Error";
-        if (throwable != null && throwable instanceof NullPointerException) {
-            message = "Images not exist";
-        }
+        String message = throwable != null ? throwable.getMessage() : "Unknown Error";
         Toast.makeText(this, message, Toast.LENGTH_SHORT).show();
     }
 

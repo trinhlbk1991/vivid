@@ -9,7 +9,6 @@ import com.icetea09.vivid.R;
 
 import static com.icetea09.vivid.features.imagepicker.ImagePicker.EXTRA_FOLDER_TITLE;
 import static com.icetea09.vivid.features.imagepicker.ImagePicker.EXTRA_IMAGE_DIRECTORY;
-import static com.icetea09.vivid.features.imagepicker.ImagePicker.EXTRA_IMAGE_TITLE;
 import static com.icetea09.vivid.features.imagepicker.ImagePicker.EXTRA_LIMIT;
 import static com.icetea09.vivid.features.imagepicker.ImagePicker.EXTRA_MODE;
 import static com.icetea09.vivid.features.imagepicker.ImagePicker.EXTRA_RETURN_AFTER_FIRST;
