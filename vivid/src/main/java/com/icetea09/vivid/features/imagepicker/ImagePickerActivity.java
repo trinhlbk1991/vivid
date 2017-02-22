@@ -27,8 +27,6 @@ import com.icetea09.vivid.adapter.ImagePickerAdapter;
 import com.icetea09.vivid.databinding.ActivityImagePickerBinding;
 import com.icetea09.vivid.features.ImageLoader;
 import com.icetea09.vivid.features.camera.CameraHelper;
-import com.icetea09.vivid.listeners.OnFolderClickListener;
-import com.icetea09.vivid.listeners.OnImageClickListener;
 import com.icetea09.vivid.model.Folder;
 import com.icetea09.vivid.model.Image;
 import com.icetea09.vivid.view.GridSpacingItemDecoration;
@@ -38,7 +36,7 @@ import java.util.List;
 
 import static com.icetea09.vivid.features.imagepicker.ImagePicker.EXTRA_SELECTED_IMAGES;
 
-public class ImagePickerActivity extends AppCompatActivity implements OnImageClickListener {
+public class ImagePickerActivity extends AppCompatActivity implements ImagePickerAdapter.OnImageClickListener {
 
     private static final String TAG = ImagePickerActivity.class.getSimpleName();
     private static final int RC_CAPTURE = 2000;
@@ -193,7 +191,7 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
     }
 
     @Override
-    public void onClick(View view, int position) {
+    public void onImageClick(View view, int position) {
         Image image = imageAdapter.getItem(position);
         presenter.handleImageClick(position, image);
     }
@@ -213,9 +211,6 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
     }
 
 
-
-
-
     public void setUpView(String title) {
         setSupportActionBar(binding.toolbar);
         ActionBar actionBar = getSupportActionBar();
@@ -228,7 +223,7 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
 
         /** Init folder and image adapter */
         imageAdapter = new ImagePickerAdapter(this, this);
-        folderAdapter = new FolderPickerAdapter(this, new OnFolderClickListener() {
+        folderAdapter = new FolderPickerAdapter(this, new FolderPickerAdapter.OnFolderClickListener() {
             @Override
             public void onFolderClick(Folder folder) {
                 foldersState = binding.recyclerView.getLayoutManager().onSaveInstanceState();

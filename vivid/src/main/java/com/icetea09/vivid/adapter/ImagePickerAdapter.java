@@ -11,7 +11,6 @@ import android.widget.ImageView;
 
 import com.bumptech.glide.Glide;
 import com.icetea09.vivid.R;
-import com.icetea09.vivid.listeners.OnImageClickListener;
 import com.icetea09.vivid.model.Image;
 
 import java.util.ArrayList;
@@ -102,9 +101,12 @@ public class ImagePickerAdapter extends RecyclerView.Adapter<ImagePickerAdapter.
         @Override
         public void onClick(View view) {
             view.setSelected(true);
-            itemClickListener.onClick(view, getAdapterPosition());
+            itemClickListener.onImageClick(view, getAdapterPosition());
         }
     }
 
+    public interface OnImageClickListener {
+        void onImageClick(View view, int position);
+    }
 
 }

@@ -10,14 +10,10 @@ import android.widget.TextView;
 
 import com.bumptech.glide.Glide;
 import com.icetea09.vivid.R;
-import com.icetea09.vivid.listeners.OnFolderClickListener;
 import com.icetea09.vivid.model.Folder;
 
 import java.util.List;
 
-/**
- * Created by boss1088 on 8/22/16.
- */
 public class FolderPickerAdapter extends RecyclerView.Adapter<FolderPickerAdapter.FolderViewHolder> {
 
     private Context context;
@@ -85,6 +81,10 @@ public class FolderPickerAdapter extends RecyclerView.Adapter<FolderPickerAdapte
             name = (TextView) itemView.findViewById(R.id.tv_name);
             number = (TextView) itemView.findViewById(R.id.tv_number);
         }
+    }
+
+    public interface OnFolderClickListener {
+        void onFolderClick(Folder folder);
     }
 
 }
