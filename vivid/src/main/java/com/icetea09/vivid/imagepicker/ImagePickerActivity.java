@@ -140,8 +140,6 @@ public class ImagePickerActivity extends AppCompatActivity {
             onBackPressed();
         } else if (id == R.id.menu_done) {
             presenter.onDoneSelectImages();
-        } else if (id == R.id.menu_camera) {
-            captureImageWithPermission();
         }
         return super.onOptionsItemSelected(item);
     }
@@ -214,7 +212,6 @@ public class ImagePickerActivity extends AppCompatActivity {
             actionBar.setDisplayShowTitleEnabled(true);
         }
 
-        /** Init folder and image adapter */
         imageAdapter = new ImagePickerAdapter(this, new ImagePickerAdapter.OnImageClickListener() {
             @Override
             public void onImageClick(View view, int position) {
@@ -228,6 +225,13 @@ public class ImagePickerActivity extends AppCompatActivity {
             public void onFolderClick(Folder folder) {
                 foldersState = binding.recyclerView.getLayoutManager().onSaveInstanceState();
                 setUpImageAdapter(folder.getImages());
+            }
+        });
+
+        binding.fabCamera.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View v) {
+                captureImageWithPermission();
             }
         });
     }
