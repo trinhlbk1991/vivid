@@ -59,7 +59,6 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
 
     private ImagePickerPresenter presenter;
 
-    private Handler handler;
     private ContentObserver observer;
     private Parcelable foldersState;
 
@@ -307,10 +306,6 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
     @Override
     protected void onStart() {
         super.onStart();
-
-        if (handler == null) {
-            handler = new Handler();
-        }
         observer = new ContentObserver(new Handler()) {
             @Override
             public void onChange(boolean selfChange) {
@@ -346,11 +341,6 @@ public class ImagePickerActivity extends AppCompatActivity implements OnImageCli
         if (observer != null) {
             getContentResolver().unregisterContentObserver(observer);
             observer = null;
-        }
-
-        if (handler != null) {
-            handler.removeCallbacksAndMessages(null);
-            handler = null;
         }
     }
 
