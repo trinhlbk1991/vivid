@@ -36,8 +36,8 @@ public class Configuration implements Parcelable {
     public Configuration(Context context) {
         this.mode = ImagePicker.MULTIPLE;
         this.limit = ImagePicker.MAX_LIMIT;
-        this.defaultToolbarTitle = context.getString(R.string.ef_title_select_image);
-        this.capturedImageDirectory = context.getString(R.string.ef_image_directory);
+        this.defaultToolbarTitle = context.getString(R.string.tap_to_select_image);
+        this.capturedImageDirectory = context.getString(R.string.image_directory);
         this.returnAfterFirst = true;
     }
 

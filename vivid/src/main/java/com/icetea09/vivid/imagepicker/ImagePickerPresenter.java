@@ -115,7 +115,7 @@ public class ImagePickerPresenter extends BasePresenter<ImagePickerActivity> {
         Context context = activity.getApplicationContext();
         Intent intent = cameraModule.getCameraIntent(activity, configuration);
         if (intent == null) {
-            Toast.makeText(context, context.getString(R.string.ef_error_create_image_file), Toast.LENGTH_LONG).show();
+            Toast.makeText(context, context.getString(R.string.create_file_failed), Toast.LENGTH_LONG).show();
             return;
         }
         activity.startActivityForResult(intent, requestCode);

@@ -237,8 +237,8 @@ public class ImagePickerActivity extends AppCompatActivity {
         binding.toolbar.setTitle(title);
         if (mode == ImagePicker.MULTIPLE) {
             binding.toolbar.setTitle(limit == ImagePicker.MAX_LIMIT
-                    ? String.format(getString(R.string.ef_selected), noSelectedImages)
-                    : String.format(getString(R.string.ef_selected_with_limit), noSelectedImages, limit));
+                    ? String.format(getString(R.string.format_selected), noSelectedImages)
+                    : String.format(getString(R.string.format_selected_with_limit), noSelectedImages, limit));
         }
     }
 
@@ -286,7 +286,7 @@ public class ImagePickerActivity extends AppCompatActivity {
     }
 
     public void showErrorExceedLimit() {
-        Toast.makeText(this, R.string.ef_msg_limit_images, Toast.LENGTH_SHORT).show();
+        Toast.makeText(this, R.string.limit_images, Toast.LENGTH_SHORT).show();
     }
 
     public void removeImage(Image image, int clickPosition) {

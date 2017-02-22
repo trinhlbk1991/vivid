@@ -1,25 +1,25 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
-    <string name="ef_permission_write_external_rationale">Permite accesul de stocare extern pentru a selecta imagini</string>
+    <string name="permission_write_external_rationale">Permite accesul de stocare extern pentru a selecta imagini</string>
 
-    <string name="ef_ok">OK</string>
-    <string name="ef_done">TERMINAT</string>
-    <string name="ef_camera">CAMERA</string>
+    <string name="ok">OK</string>
+    <string name="done">TERMINAT</string>
+    <string name="camera">CAMERA</string>
 
-    <string name="ef_title_folder">Fișier</string>
-    <string name="ef_title_select_image">Atingeți pentru a selecta imagini</string>
+    <string name="folder">Fișier</string>
+    <string name="tap_to_select_image">Atingeți pentru a selecta imagini</string>
 
-    <string name="ef_selected">%d selectate</string>
-    <string name="ef_selected_with_limit">%1$d/%2$d selectate</string>
+    <string name="format_selected">%d selectate</string>
+    <string name="format_selected_with_limit">%1$d/%2$d selectate</string>
 
-    <string name="ef_error_create_image_file">Nu am putut crea imaginea</string>
+    <string name="create_file_failed">Nu am putut crea imaginea</string>
     <string name="no_camera">Camera foto nu a fost găsită</string>
-    <string name="ef_error_null_cursor">Hopa, ceva a mers prost!</string>
+    <string name="some_thing_went_wrong">Hopa, ceva a mers prost!</string>
 
-    <string name="ef_msg_empty_images">Nu am găsit imaginea</string>
-    <string name="ef_msg_no_write_external_permission">Vă rugăm să acordați permisiunea de stocare pentru a selecta imagini</string>
-    <string name="ef_msg_no_camera_permission">Vă rugăm să acordați permisiunea fotocamerei pentru a captura imagini</string>
-    <string name="ef_msg_limit_images">Limita de selecție a imaginii depăşită</string>
-    <string name="ef_ltitle_permission_denied">Acces refuzat</string>
+    <string name="no_images_found">Nu am găsit imaginea</string>
+    <string name="no_write_external_permission">Vă rugăm să acordați permisiunea de stocare pentru a selecta imagini</string>
+    <string name="no_camera_permission">Vă rugăm să acordați permisiunea fotocamerei pentru a captura imagini</string>
+    <string name="limit_images">Limita de selecție a imaginii depăşită</string>
+    <string name="permission_denied">Acces refuzat</string>
 
 </resources>
