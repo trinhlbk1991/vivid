@@ -41,7 +41,7 @@ public class ImagePickerPresenter extends BasePresenter<ImagePickerActivity> {
     @Override
     public void attachView(ImagePickerActivity view) {
         super.attachView(view);
-        view.setUpView(configuration.getFolderTitle());
+        view.setUpView(configuration.getDefaultToolbarTitle());
     }
 
     public void abortLoad() {
@@ -178,8 +178,8 @@ public class ImagePickerPresenter extends BasePresenter<ImagePickerActivity> {
     }
 
     private void updateTitle() {
-        String title = view.isDisplayingFolderView() ? configuration.getFolderTitle() : configuration.getImageTitle();
-        view.updateTitle(title, configuration.getMode(), selectedImages.size(), configuration.getLimit());
+        view.updateTitle(configuration.getDefaultToolbarTitle(), configuration.getMode(),
+                selectedImages.size(), configuration.getLimit());
     }
 
     private int selectedImagePosition(Image image) {
