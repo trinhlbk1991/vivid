@@ -341,7 +341,7 @@ public class ImagePickerActivity extends AppCompatActivity {
         layoutManager.setSpanCount(columns);
         if (itemOffsetDecoration != null)
             binding.recyclerView.removeItemDecoration(itemOffsetDecoration);
-        itemOffsetDecoration = new GridSpacingItemDecoration(columns, getResources().getDimensionPixelSize(R.dimen.ef_item_padding), false);
+        itemOffsetDecoration = new GridSpacingItemDecoration(columns, getResources().getDimensionPixelSize(R.dimen.item_padding), false);
         binding.recyclerView.addItemDecoration(itemOffsetDecoration);
     }
 

@@ -23,7 +23,7 @@
             android:layout_centerInParent="true"
             android:padding="@dimen/ef_padding_large"
             android:text="@string/no_images_found"
-            android:textSize="@dimen/ef_font_medium"
+            android:textSize="@dimen/font_medium"
             android:visibility="gone" />
 
         <ProgressBar
@@ -45,7 +45,7 @@
             android:layout_height="wrap_content"
             android:layout_alignParentBottom="true"
             android:layout_centerHorizontal="true"
-            android:layout_marginBottom="@dimen/ef_margin_large"
+            android:layout_marginBottom="@dimen/spacing_normal"
             android:src="@drawable/ic_camera_white"
             app:fabSize="normal" />
     </RelativeLayout>
