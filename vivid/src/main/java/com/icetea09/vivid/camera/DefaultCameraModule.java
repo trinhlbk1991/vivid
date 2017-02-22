@@ -1,4 +1,4 @@
-package com.icetea09.vivid.features.camera;
+package com.icetea09.vivid.camera;
 
 import android.content.Context;
 import android.content.Intent;
@@ -8,8 +8,8 @@ import android.provider.MediaStore;
 import android.support.v4.content.FileProvider;
 import android.util.Log;
 
-import com.icetea09.vivid.features.imagepicker.Configuration;
 import com.icetea09.vivid.helper.ImagePickerUtils;
+import com.icetea09.vivid.imagepicker.Configuration;
 import com.icetea09.vivid.model.ImageFactory;
 
 import java.io.File;

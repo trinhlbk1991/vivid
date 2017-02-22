@@ -1,4 +1,4 @@
-package com.icetea09.vivid.features.imagepicker;
+package com.icetea09.vivid.imagepicker;
 
 import android.content.Context;
 import android.content.Intent;
@@ -7,13 +7,13 @@ import android.os.Parcelable;
 
 import com.icetea09.vivid.R;
 
-import static com.icetea09.vivid.features.imagepicker.ImagePicker.EXTRA_FOLDER_TITLE;
-import static com.icetea09.vivid.features.imagepicker.ImagePicker.EXTRA_IMAGE_DIRECTORY;
-import static com.icetea09.vivid.features.imagepicker.ImagePicker.EXTRA_LIMIT;
-import static com.icetea09.vivid.features.imagepicker.ImagePicker.EXTRA_MODE;
-import static com.icetea09.vivid.features.imagepicker.ImagePicker.EXTRA_RETURN_AFTER_FIRST;
-import static com.icetea09.vivid.features.imagepicker.ImagePicker.MAX_LIMIT;
-import static com.icetea09.vivid.features.imagepicker.ImagePicker.MULTIPLE;
+import static com.icetea09.vivid.imagepicker.ImagePicker.EXTRA_FOLDER_TITLE;
+import static com.icetea09.vivid.imagepicker.ImagePicker.EXTRA_IMAGE_DIRECTORY;
+import static com.icetea09.vivid.imagepicker.ImagePicker.EXTRA_LIMIT;
+import static com.icetea09.vivid.imagepicker.ImagePicker.EXTRA_MODE;
+import static com.icetea09.vivid.imagepicker.ImagePicker.EXTRA_RETURN_AFTER_FIRST;
+import static com.icetea09.vivid.imagepicker.ImagePicker.MAX_LIMIT;
+import static com.icetea09.vivid.imagepicker.ImagePicker.MULTIPLE;
 
 public class Configuration implements Parcelable {
 

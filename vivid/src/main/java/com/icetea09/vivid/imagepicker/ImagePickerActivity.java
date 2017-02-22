@@ -1,4 +1,4 @@
-package com.icetea09.vivid.features.imagepicker;
+package com.icetea09.vivid.imagepicker;
 
 import android.Manifest;
 import android.content.Context;
@@ -21,12 +21,12 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
+import com.icetea09.vivid.ImageLoader;
 import com.icetea09.vivid.R;
 import com.icetea09.vivid.adapter.FolderPickerAdapter;
 import com.icetea09.vivid.adapter.ImagePickerAdapter;
+import com.icetea09.vivid.camera.CameraHelper;
 import com.icetea09.vivid.databinding.ActivityImagePickerBinding;
-import com.icetea09.vivid.features.ImageLoader;
-import com.icetea09.vivid.features.camera.CameraHelper;
 import com.icetea09.vivid.model.Folder;
 import com.icetea09.vivid.model.Image;
 import com.icetea09.vivid.view.GridSpacingItemDecoration;
@@ -34,9 +34,9 @@ import com.icetea09.vivid.view.GridSpacingItemDecoration;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.icetea09.vivid.features.imagepicker.ImagePicker.EXTRA_SELECTED_IMAGES;
+import static com.icetea09.vivid.imagepicker.ImagePicker.EXTRA_SELECTED_IMAGES;
 
-public class ImagePickerActivity extends AppCompatActivity implements ImagePickerAdapter.OnImageClickListener {
+public class ImagePickerActivity extends AppCompatActivity {
 
     private static final String TAG = ImagePickerActivity.class.getSimpleName();
     private static final int RC_CAPTURE = 2000;
@@ -190,20 +190,13 @@ public class ImagePickerActivity extends AppCompatActivity implements ImagePicke
         }
     }
 
-    @Override
-    public void onImageClick(View view, int position) {
-        Image image = imageAdapter.getItem(position);
-        presenter.handleImageClick(position, image);
-    }
-
-
     /**
      * When press back button, show folders if view is displaying images
      */
     @Override
     public void onBackPressed() {
         if (!isDisplayingFolderView()) {
-            setFolderAdapter(null);
+            setUpFolderAdapter(null);
             return;
         }
         setResult(RESULT_CANCELED);
@@ -222,25 +215,27 @@ public class ImagePickerActivity extends AppCompatActivity implements ImagePicke
         }
 
         /** Init folder and image adapter */
-        imageAdapter = new ImagePickerAdapter(this, this);
+        imageAdapter = new ImagePickerAdapter(this, new ImagePickerAdapter.OnImageClickListener() {
+            @Override
+            public void onImageClick(View view, int position) {
+                Image image = imageAdapter.getItem(position);
+                presenter.handleImageClick(position, image);
+            }
+        });
+
         folderAdapter = new FolderPickerAdapter(this, new FolderPickerAdapter.OnFolderClickListener() {
             @Override
             public void onFolderClick(Folder folder) {
                 foldersState = binding.recyclerView.getLayoutManager().onSaveInstanceState();
-                setImageAdapter(folder.getImages());
+                setUpImageAdapter(folder.getImages());
             }
         });
     }
 
-    /**
-     * Update activity title
-     * If we're displaying folder, set folder title
-     * If we're displaying images, show number of selected images
-     */
     public void updateTitle(String title, int mode, int noSelectedImages, int limit) {
         supportInvalidateOptionsMenu();
         binding.toolbar.setTitle(title);
-        if (!isDisplayingFolderView() && mode == ImagePicker.MULTIPLE) {
+        if (mode == ImagePicker.MULTIPLE) {
             binding.toolbar.setTitle(limit == ImagePicker.MAX_LIMIT
                     ? String.format(getString(R.string.ef_selected), noSelectedImages)
                     : String.format(getString(R.string.ef_selected_with_limit), noSelectedImages, limit));
@@ -256,8 +251,7 @@ public class ImagePickerActivity extends AppCompatActivity implements ImagePicke
 
     public void finishPickImages(List<Image> images) {
         Intent data = new Intent();
-        data.putParcelableArrayListExtra(EXTRA_SELECTED_IMAGES,
-                (ArrayList<? extends Parcelable>) images);
+        data.putParcelableArrayListExtra(EXTRA_SELECTED_IMAGES, (ArrayList<? extends Parcelable>) images);
         setResult(RESULT_OK, data);
         finish();
     }
@@ -267,7 +261,7 @@ public class ImagePickerActivity extends AppCompatActivity implements ImagePicke
     }
 
     public void showFetchCompleted(List<Folder> folders) {
-        setFolderAdapter(folders);
+        setUpFolderAdapter(folders);
     }
 
     public void showError(Throwable throwable) {
@@ -303,25 +297,13 @@ public class ImagePickerActivity extends AppCompatActivity implements ImagePicke
         imageAdapter.removeAllSelectedSingleClick();
     }
 
-    /**
-     * Set image adapter
-     * 1. Set new data
-     * 2. Update item decoration
-     * 3. Update title
-     */
-    private void setImageAdapter(List<Image> images) {
+    private void setUpImageAdapter(List<Image> images) {
         imageAdapter.setData(images);
         setItemDecoration(imageColumns);
         binding.recyclerView.setAdapter(imageAdapter);
     }
 
-    /**
-     * Set folder adapter
-     * 1. Set new data
-     * 2. Update item decoration
-     * 3. Update title
-     */
-    private void setFolderAdapter(List<Folder> folders) {
+    private void setUpFolderAdapter(List<Folder> folders) {
         if (folders != null) {
             folderAdapter.setData(folders);
         }

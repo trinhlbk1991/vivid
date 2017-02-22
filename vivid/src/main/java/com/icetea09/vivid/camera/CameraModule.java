@@ -1,9 +1,9 @@
-package com.icetea09.vivid.features.camera;
+package com.icetea09.vivid.camera;
 
 import android.content.Context;
 import android.content.Intent;
 
-import com.icetea09.vivid.features.imagepicker.Configuration;
+import com.icetea09.vivid.imagepicker.Configuration;
 
 public interface CameraModule {
     Intent getCameraIntent(Context context, Configuration config);

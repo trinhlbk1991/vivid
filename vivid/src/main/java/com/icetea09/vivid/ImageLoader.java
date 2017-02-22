@@ -1,10 +1,10 @@
-package com.icetea09.vivid.features;
+package com.icetea09.vivid;
 
 import android.content.Context;
 import android.database.Cursor;
 import android.provider.MediaStore;
 
-import com.icetea09.vivid.features.common.ImageLoaderListener;
+import com.icetea09.vivid.common.ImageLoaderListener;
 import com.icetea09.vivid.model.Folder;
 import com.icetea09.vivid.model.Image;
 

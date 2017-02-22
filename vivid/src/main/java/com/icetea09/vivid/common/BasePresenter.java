@@ -1,4 +1,4 @@
-package com.icetea09.vivid.features.common;
+package com.icetea09.vivid.common;
 
 public class BasePresenter<T> {
 

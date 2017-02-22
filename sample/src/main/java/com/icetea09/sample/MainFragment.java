@@ -10,7 +10,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.widget.ImageView;
 
-import com.icetea09.vivid.features.imagepicker.ImagePicker;
+import com.icetea09.vivid.imagepicker.ImagePicker;
 import com.icetea09.vivid.model.Image;
 
 import java.util.List;

@@ -1,4 +1,4 @@
-package com.icetea09.vivid.features.imagepicker;
+package com.icetea09.vivid.imagepicker;
 
 import android.app.Activity;
 import android.content.Context;
@@ -8,13 +8,13 @@ import android.os.Looper;
 import android.view.MenuItem;
 import android.widget.Toast;
 
+import com.icetea09.vivid.ImageLoader;
 import com.icetea09.vivid.R;
-import com.icetea09.vivid.features.ImageLoader;
-import com.icetea09.vivid.features.camera.CameraModule;
-import com.icetea09.vivid.features.camera.DefaultCameraModule;
-import com.icetea09.vivid.features.camera.OnImageReadyListener;
-import com.icetea09.vivid.features.common.BasePresenter;
-import com.icetea09.vivid.features.common.ImageLoaderListener;
+import com.icetea09.vivid.camera.CameraModule;
+import com.icetea09.vivid.camera.DefaultCameraModule;
+import com.icetea09.vivid.camera.OnImageReadyListener;
+import com.icetea09.vivid.common.BasePresenter;
+import com.icetea09.vivid.common.ImageLoaderListener;
 import com.icetea09.vivid.model.Folder;
 import com.icetea09.vivid.model.Image;
 
@@ -22,7 +22,7 @@ import java.io.File;
 import java.util.ArrayList;
 import java.util.List;
 
-import static com.icetea09.vivid.features.imagepicker.ImagePicker.SINGLE;
+import static com.icetea09.vivid.imagepicker.ImagePicker.SINGLE;
 
 public class ImagePickerPresenter extends BasePresenter<ImagePickerActivity> {
 

@@ -1,4 +1,4 @@
-package com.icetea09.vivid.features.camera;
+package com.icetea09.vivid.camera;
 
 import android.content.Context;
 import android.content.Intent;

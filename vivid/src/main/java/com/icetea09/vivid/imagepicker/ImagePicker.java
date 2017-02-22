@@ -1,4 +1,4 @@
-package com.icetea09.vivid.features.imagepicker;
+package com.icetea09.vivid.imagepicker;
 
 import android.app.Activity;
 import android.content.Context;

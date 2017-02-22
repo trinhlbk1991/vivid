@@ -1,4 +1,4 @@
-package com.icetea09.vivid.features.imagepicker;
+package com.icetea09.vivid.imagepicker;
 
 import android.support.v4.app.Fragment;
 

@@ -12,11 +12,11 @@ import android.view.View;
 import android.widget.Switch;
 import android.widget.TextView;
 
-import com.icetea09.vivid.features.camera.CameraModule;
-import com.icetea09.vivid.features.camera.ImmediateCameraModule;
-import com.icetea09.vivid.features.camera.OnImageReadyListener;
-import com.icetea09.vivid.features.imagepicker.ImagePicker;
-import com.icetea09.vivid.features.imagepicker.ImagePickerActivity;
+import com.icetea09.vivid.camera.CameraModule;
+import com.icetea09.vivid.camera.ImmediateCameraModule;
+import com.icetea09.vivid.camera.OnImageReadyListener;
+import com.icetea09.vivid.imagepicker.ImagePicker;
+import com.icetea09.vivid.imagepicker.ImagePickerActivity;
 import com.icetea09.vivid.model.Image;
 
 import java.util.ArrayList;
