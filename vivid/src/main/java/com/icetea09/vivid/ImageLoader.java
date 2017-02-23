@@ -108,7 +108,7 @@ public class ImageLoader {
                 folders = new ArrayList<>(folderMap.values());
             }
 
-            listener.onImageLoaded(temp, folders);
+            listener.onImageLoaded(folders);
         }
     }
 }

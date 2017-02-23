@@ -3,12 +3,10 @@ package com.icetea09.vivid.imagepicker;
 import android.app.Activity;
 import android.content.Context;
 import android.content.Intent;
-import android.os.Handler;
-import android.os.Looper;
 import android.view.MenuItem;
 import android.widget.Toast;
 
-import com.icetea09.vivid.ImageLoader;
+import com.icetea09.vivid.LoadImagesTask;
 import com.icetea09.vivid.R;
 import com.icetea09.vivid.camera.CameraModule;
 import com.icetea09.vivid.camera.DefaultCameraModule;
@@ -24,16 +22,14 @@ import java.util.List;
 
 import static com.icetea09.vivid.imagepicker.ImagePicker.SINGLE;
 
-public class ImagePickerPresenter extends BasePresenter<ImagePickerActivity> {
+public class ImagePickerPresenter extends BasePresenter<ImagePickerActivity> implements ImageLoaderListener {
 
-    private ImageLoader imageLoader;
+    private LoadImagesTask loadImagesTask;
     private CameraModule cameraModule = new DefaultCameraModule();
-    private Handler handler = new Handler(Looper.getMainLooper());
     private Configuration configuration;
     private List<Image> selectedImages;
 
-    public ImagePickerPresenter(ImageLoader imageLoader, Configuration configuration) {
-        this.imageLoader = imageLoader;
+    public ImagePickerPresenter(Configuration configuration) {
         this.configuration = configuration;
         this.selectedImages = new ArrayList<>();
     }
@@ -44,61 +40,45 @@ public class ImagePickerPresenter extends BasePresenter<ImagePickerActivity> {
         view.setUpView(configuration.getDefaultToolbarTitle());
     }
 
-    public void abortLoad() {
-        imageLoader.abortLoadImages();
+    @Override
+    public void onImageLoaded(List<Folder> folders) {
+        if (isViewAttached()) {
+            view.showFetchCompleted(folders);
+            if (folders != null) {
+                if (folders.isEmpty()) {
+                    view.showEmpty();
+                } else {
+                    view.showLoading(false);
+                }
+            }
+        }
+        abortLoad();
     }
 
-    public void loadImages(boolean isFolderMode) {
-        if (!isViewAttached()) {
-            return;
+    @Override
+    public void onFailed(Throwable throwable) {
+        if (isViewAttached()) {
+            view.showError(throwable);
         }
+    }
 
-        view.showLoading(true);
-        imageLoader.loadDeviceImages(isFolderMode, new ImageLoaderListener() {
-            @Override
-            public void onImageLoaded(final List<Image> images, final List<Folder> folders) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (isViewAttached()) {
-                            view.showFetchCompleted(folders);
+    public void abortLoad() {
+        if (loadImagesTask != null) {
+            loadImagesTask.cancel(true);
+        }
+        loadImagesTask = null;
+    }
 
-                            if (folders != null) {
-                                if (folders.isEmpty()) {
-                                    view.showEmpty();
-                                } else {
-                                    view.showLoading(false);
-                                }
-                            } else {
-                                if (images.isEmpty()) {
-                                    view.showEmpty();
-                                } else {
-                                    view.showLoading(false);
-                                }
-                            }
-                        }
-                    }
-                });
-            }
-
-            @Override
-            public void onFailed(final Throwable throwable) {
-                handler.post(new Runnable() {
-                    @Override
-                    public void run() {
-                        if (isViewAttached()) {
-                            view.showError(throwable);
-                        }
-                    }
-                });
-            }
-        });
+    public void loadImages() {
+        if (isViewAttached()) {
+            view.showLoading(true);
+            loadImagesTask = new LoadImagesTask(view, this);
+            loadImagesTask.execute();
+        }
     }
 
     public void onDoneSelectImages() {
         if (selectedImages != null && selectedImages.size() > 0) {
-
-            /** Scan selected images which not existed */
             for (int i = 0; i < selectedImages.size(); i++) {
                 Image image = selectedImages.get(i);
                 File file = new File(image.getPath());

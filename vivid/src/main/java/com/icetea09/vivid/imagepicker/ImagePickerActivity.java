@@ -21,7 +21,6 @@ import android.view.MenuItem;
 import android.view.View;
 import android.widget.Toast;
 
-import com.icetea09.vivid.ImageLoader;
 import com.icetea09.vivid.R;
 import com.icetea09.vivid.adapter.FolderPickerAdapter;
 import com.icetea09.vivid.adapter.ImagePickerAdapter;
@@ -77,7 +76,7 @@ public class ImagePickerActivity extends AppCompatActivity {
         Bundle bundle = intent.getExtras();
         Configuration config = bundle.getParcelable(Configuration.class.getSimpleName());
         config = config != null ? config : Configuration.create(this, intent);
-        presenter = new ImagePickerPresenter(new ImageLoader(this), config);
+        presenter = new ImagePickerPresenter(config);
         presenter.attachView(this);
         orientationBasedUI(getResources().getConfiguration().orientation);
     }
@@ -88,7 +87,7 @@ public class ImagePickerActivity extends AppCompatActivity {
         observer = new ContentObserver(new Handler()) {
             @Override
             public void onChange(boolean selfChange) {
-                getData();
+                presenter.loadImages();
             }
         };
         getContentResolver().registerContentObserver(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, false, observer);
@@ -161,7 +160,7 @@ public class ImagePickerActivity extends AppCompatActivity {
         switch (requestCode) {
             case RC_PERMISSION_WRITE_EXTERNAL_STORAGE: {
                 if (grantResults.length != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    getData();
+                    presenter.loadImages();
                     return;
                 }
                 finish();
@@ -351,16 +350,11 @@ public class ImagePickerActivity extends AppCompatActivity {
     private void getDataWithPermission() {
         int rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE);
         if (rc == PackageManager.PERMISSION_GRANTED) {
-            getData();
+            presenter.loadImages();
         } else {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.WRITE_EXTERNAL_STORAGE},
                     RC_PERMISSION_WRITE_EXTERNAL_STORAGE);
         }
-    }
-
-    private void getData() {
-        presenter.abortLoad();
-        presenter.loadImages(true);
     }
 
     /**
