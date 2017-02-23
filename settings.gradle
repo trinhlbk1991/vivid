@@ -1,1 +1,1 @@
-include ':vivid', ':sample'
+include ':library', ':sample'
