@@ -22,6 +22,7 @@ public class Configuration implements Parcelable {
     private int mode;
     private int limit;
     private boolean returnAfterFirst;
+    private int theme;
 
     public static Configuration create(Context context, Intent intent) {
         Configuration config = new Configuration(context);
@@ -39,6 +40,7 @@ public class Configuration implements Parcelable {
         this.defaultToolbarTitle = context.getString(R.string.tap_to_select_image);
         this.capturedImageDirectory = context.getString(R.string.image_directory);
         this.returnAfterFirst = true;
+        this.theme = R.style.AppTheme;
     }
 
     public boolean isReturnAfterFirst() {
@@ -81,6 +83,14 @@ public class Configuration implements Parcelable {
         this.capturedImageDirectory = capturedImageDirectory;
     }
 
+    public int getTheme() {
+        return theme;
+    }
+
+    public void setTheme(int theme) {
+        this.theme = theme;
+    }
+
     @Override
     public int describeContents() {
         return 0;
@@ -93,6 +103,7 @@ public class Configuration implements Parcelable {
         dest.writeInt(this.mode);
         dest.writeInt(this.limit);
         dest.writeByte(this.returnAfterFirst ? (byte) 1 : (byte) 0);
+        dest.writeInt(this.theme);
     }
 
     protected Configuration(Parcel in) {
@@ -101,6 +112,7 @@ public class Configuration implements Parcelable {
         this.mode = in.readInt();
         this.limit = in.readInt();
         this.returnAfterFirst = in.readByte() != 0;
+        this.theme = in.readInt();
     }
 
     public static final Creator<Configuration> CREATOR = new Creator<Configuration>() {

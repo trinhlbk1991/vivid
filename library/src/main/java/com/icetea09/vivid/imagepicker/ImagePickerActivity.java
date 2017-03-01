@@ -64,9 +64,6 @@ public class ImagePickerActivity extends AppCompatActivity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_image_picker);
-
         Intent intent = getIntent();
         if (intent == null || intent.getExtras() == null) {
             finish();
@@ -76,6 +73,10 @@ public class ImagePickerActivity extends AppCompatActivity {
         Bundle bundle = intent.getExtras();
         Configuration config = bundle.getParcelable(Configuration.class.getSimpleName());
         config = config != null ? config : Configuration.create(this, intent);
+
+        setTheme(config.getTheme());
+        super.onCreate(savedInstanceState);
+        binding = DataBindingUtil.setContentView(this, R.layout.activity_image_picker);
         presenter = new ImagePickerPresenter(config);
         presenter.attachView(this);
         orientationBasedUI(getResources().getConfiguration().orientation);

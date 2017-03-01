@@ -96,6 +96,17 @@ public abstract class ImagePicker {
         return this;
     }
 
+    /**
+     * Set theme for the Vivid image picker
+     *
+     * @param theme theme resource id
+     * @return ImagePicker object
+     */
+    public ImagePicker theme(int theme) {
+        config.setTheme(theme);
+        return this;
+    }
+
     public static List<Image> getImages(Intent intent) {
         if (intent == null) {
             return null;
