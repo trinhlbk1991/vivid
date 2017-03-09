@@ -55,15 +55,17 @@ public class LoadImagesTask extends AsyncTask<Void, Integer, List<Folder>> {
                 String path = cursor.getString(cursor.getColumnIndex(projection[2]));
                 String bucketDisplayName = cursor.getString(cursor.getColumnIndex(projection[3]));
 
-                File file = new File(path);
-                if (file.exists()) {
-                    Image image = new Image(id, name, path, false);
-                    Folder folder = folderMap.get(bucketDisplayName);
-                    if (folder == null) {
-                        folder = new Folder(bucketDisplayName);
-                        folderMap.put(bucketDisplayName, folder);
+                if (path != null) {
+                    File file = new File(path);
+                    if (file.exists()) {
+                        Image image = new Image(id, name, path, false);
+                        Folder folder = folderMap.get(bucketDisplayName);
+                        if (folder == null) {
+                            folder = new Folder(bucketDisplayName);
+                            folderMap.put(bucketDisplayName, folder);
+                        }
+                        folder.getImages().add(image);
                     }
-                    folder.getImages().add(image);
                 }
 
             } while (cursor.moveToPrevious());
