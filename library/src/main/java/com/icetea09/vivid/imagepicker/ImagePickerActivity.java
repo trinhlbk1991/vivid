@@ -12,13 +12,18 @@ import android.os.Handler;
 import android.os.Parcelable;
 import android.provider.MediaStore;
 import android.support.annotation.NonNull;
+import android.support.design.widget.FloatingActionButton;
 import android.support.v4.app.ActivityCompat;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.AppCompatActivity;
 import android.support.v7.widget.GridLayoutManager;
+import android.support.v7.widget.RecyclerView;
+import android.support.v7.widget.Toolbar;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.ProgressBar;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.icetea09.vivid.R;
@@ -48,7 +53,12 @@ public class ImagePickerActivity extends AppCompatActivity {
         return intent;
     }
 
-    ActivityImagePickerBinding binding;
+    Toolbar toolbar;
+    RecyclerView recyclerView;
+    FloatingActionButton fabCamera;
+    ProgressBar progressBar;
+    TextView tvEmptyImages;
+
     private GridLayoutManager layoutManager;
     private GridSpacingItemDecoration itemOffsetDecoration;
     private ImagePickerAdapter imageAdapter;
@@ -76,7 +86,13 @@ public class ImagePickerActivity extends AppCompatActivity {
 
         setTheme(config.getTheme());
         super.onCreate(savedInstanceState);
-        binding = DataBindingUtil.setContentView(this, R.layout.activity_image_picker);
+        setContentView(R.layout.activity_image_picker);
+        toolbar = (Toolbar) findViewById(R.id.toolbar);
+        recyclerView = (RecyclerView) findViewById(R.id.recyclerView);
+        fabCamera = (FloatingActionButton) findViewById(R.id.fab_camera);
+        progressBar = (ProgressBar) findViewById(R.id.progress_bar);
+        tvEmptyImages = (TextView) findViewById(R.id.tv_empty_images);
+
         presenter = new ImagePickerPresenter(config);
         presenter.attachView(this);
         orientationBasedUI(getResources().getConfiguration().orientation);
@@ -203,7 +219,7 @@ public class ImagePickerActivity extends AppCompatActivity {
 
 
     public void setUpView(String title) {
-        setSupportActionBar(binding.toolbar);
+        setSupportActionBar(toolbar);
         ActionBar actionBar = getSupportActionBar();
         if (actionBar != null) {
             actionBar.setTitle(title);
@@ -223,12 +239,12 @@ public class ImagePickerActivity extends AppCompatActivity {
         folderAdapter = new FolderPickerAdapter(this, new FolderPickerAdapter.OnFolderClickListener() {
             @Override
             public void onFolderClick(Folder folder) {
-                foldersState = binding.recyclerView.getLayoutManager().onSaveInstanceState();
+                foldersState = recyclerView.getLayoutManager().onSaveInstanceState();
                 setUpImageAdapter(folder.getImages());
             }
         });
 
-        binding.fabCamera.setOnClickListener(new View.OnClickListener() {
+        fabCamera.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View v) {
                 captureImageWithPermission();
@@ -238,9 +254,9 @@ public class ImagePickerActivity extends AppCompatActivity {
 
     public void updateTitle(String title, int mode, int noSelectedImages, int limit) {
         supportInvalidateOptionsMenu();
-        binding.toolbar.setTitle(title);
+        toolbar.setTitle(title);
         if (mode == ImagePicker.MULTIPLE) {
-            binding.toolbar.setTitle(limit == ImagePicker.MAX_LIMIT
+            toolbar.setTitle(limit == ImagePicker.MAX_LIMIT
                     ? String.format(getString(R.string.format_selected), noSelectedImages)
                     : String.format(getString(R.string.format_selected_with_limit), noSelectedImages, limit));
         }
@@ -250,7 +266,7 @@ public class ImagePickerActivity extends AppCompatActivity {
      * Check if displaying folders view
      */
     public boolean isDisplayingFolderView() {
-        return ((binding.recyclerView.getAdapter() == null || binding.recyclerView.getAdapter() instanceof FolderPickerAdapter));
+        return ((recyclerView.getAdapter() == null || recyclerView.getAdapter() instanceof FolderPickerAdapter));
     }
 
     public void finishPickImages(List<Image> images) {
@@ -274,15 +290,15 @@ public class ImagePickerActivity extends AppCompatActivity {
     }
 
     public void showLoading(boolean isLoading) {
-        binding.progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
-        binding.recyclerView.setVisibility(isLoading ? View.GONE : View.VISIBLE);
-        binding.tvEmptyImages.setVisibility(View.GONE);
+        progressBar.setVisibility(isLoading ? View.VISIBLE : View.GONE);
+        recyclerView.setVisibility(isLoading ? View.GONE : View.VISIBLE);
+        tvEmptyImages.setVisibility(View.GONE);
     }
 
     public void showEmpty() {
-        binding.progressBar.setVisibility(View.GONE);
-        binding.recyclerView.setVisibility(View.GONE);
-        binding.tvEmptyImages.setVisibility(View.VISIBLE);
+        progressBar.setVisibility(View.GONE);
+        recyclerView.setVisibility(View.GONE);
+        tvEmptyImages.setVisibility(View.VISIBLE);
     }
 
     public void updateSelectedImage(Image image) {
@@ -304,7 +320,7 @@ public class ImagePickerActivity extends AppCompatActivity {
     private void setUpImageAdapter(List<Image> images) {
         imageAdapter.setData(images);
         setItemDecoration(imageColumns);
-        binding.recyclerView.setAdapter(imageAdapter);
+        recyclerView.setAdapter(imageAdapter);
     }
 
     private void setUpFolderAdapter(List<Folder> folders) {
@@ -312,11 +328,11 @@ public class ImagePickerActivity extends AppCompatActivity {
             folderAdapter.setData(folders);
         }
         setItemDecoration(folderColumns);
-        binding.recyclerView.setAdapter(folderAdapter);
+        recyclerView.setAdapter(folderAdapter);
 
         if (foldersState != null) {
             layoutManager.setSpanCount(folderColumns);
-            binding.recyclerView.getLayoutManager().onRestoreInstanceState(foldersState);
+            recyclerView.getLayoutManager().onRestoreInstanceState(foldersState);
         }
     }
 
@@ -329,8 +345,8 @@ public class ImagePickerActivity extends AppCompatActivity {
 
         int columns = isDisplayingFolderView() ? folderColumns : imageColumns;
         layoutManager = new GridLayoutManager(this, columns);
-        binding.recyclerView.setLayoutManager(layoutManager);
-        binding.recyclerView.setHasFixedSize(true);
+        recyclerView.setLayoutManager(layoutManager);
+        recyclerView.setHasFixedSize(true);
         setItemDecoration(columns);
     }
 
@@ -340,9 +356,9 @@ public class ImagePickerActivity extends AppCompatActivity {
     private void setItemDecoration(int columns) {
         layoutManager.setSpanCount(columns);
         if (itemOffsetDecoration != null)
-            binding.recyclerView.removeItemDecoration(itemOffsetDecoration);
+            recyclerView.removeItemDecoration(itemOffsetDecoration);
         itemOffsetDecoration = new GridSpacingItemDecoration(columns, getResources().getDimensionPixelSize(R.dimen.item_padding), false);
-        binding.recyclerView.addItemDecoration(itemOffsetDecoration);
+        recyclerView.addItemDecoration(itemOffsetDecoration);
     }
 
     /**
