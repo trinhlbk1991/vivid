@@ -24,31 +24,31 @@ class FolderPickerAdapter(private val context: Context, private val folderClickL
     }
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int) {
-
         val folder = folders?.get(position)
 
-        Glide.with(context)
-                .load(folder?.images?.get(0)?.path)
-                .placeholder(R.drawable.folder_placeholder)
-                .error(R.drawable.folder_placeholder)
-                .into(holder.image)
+        folder?.let {
+            Glide.with(context)
+                    .load(folder.images[0].path)
+                    .placeholder(R.drawable.folder_placeholder)
+                    .error(R.drawable.folder_placeholder)
+                    .into(holder.image)
 
-        holder.name.text = folders!![position].folderName
-        holder.number.text = folders!![position].images.size.toString()
+            holder.name.text = folder.folderName
+            holder.number.text = folder.images.size.toString()
 
-        holder.itemView.setOnClickListener {
-            folder?.let { it1 -> folderClickListener?.onFolderClick(it1) }
+            holder.itemView.setOnClickListener {
+                folderClickListener?.onFolderClick(folder)
+            }
         }
     }
 
     fun setData(folders: List<Folder>) {
         this.folders = folders
-
         notifyDataSetChanged()
     }
 
     override fun getItemCount(): Int {
-        return folders!!.size
+        return folders?.let { (folders as List<Folder>).size } ?: 0
     }
 
     class FolderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {

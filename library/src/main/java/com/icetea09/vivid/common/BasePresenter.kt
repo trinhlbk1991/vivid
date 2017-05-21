@@ -11,7 +11,4 @@ open class BasePresenter<T> {
     fun detachView() {
         view = null
     }
-
-    protected val isViewAttached: Boolean
-        get() = view != null
 }

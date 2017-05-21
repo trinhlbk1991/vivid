@@ -15,18 +15,13 @@ import com.icetea09.vivid.imagepicker.ImagePicker.Companion.SINGLE
 import com.icetea09.vivid.model.Folder
 import com.icetea09.vivid.model.Image
 import java.io.File
-import java.util.*
 
 
 class ImagePickerPresenter(private val configuration: Configuration) : BasePresenter<ImagePickerActivity>(), ImageLoaderListener {
 
     private var loadImagesTask: LoadImagesTask? = null
     private val cameraModule = DefaultCameraModule()
-    private val selectedImages: MutableList<Image>?
-
-    init {
-        this.selectedImages = ArrayList<Image>()
-    }
+    private val selectedImages: MutableList<Image> = mutableListOf()
 
     override fun attachView(view: ImagePickerActivity) {
         super.attachView(view)
@@ -34,8 +29,8 @@ class ImagePickerPresenter(private val configuration: Configuration) : BasePrese
     }
 
     override fun onImageLoaded(folders: List<Folder>?) {
-        folders?.let { view?.showFetchCompleted(it) }
-        if (folders != null) {
+        folders?.let {
+            view?.showFetchCompleted(it)
             if (folders.isEmpty()) {
                 view?.showEmpty()
             } else {
@@ -50,9 +45,7 @@ class ImagePickerPresenter(private val configuration: Configuration) : BasePrese
     }
 
     fun abortLoad() {
-        if (loadImagesTask != null) {
-            loadImagesTask!!.cancel(true)
-        }
+        loadImagesTask?.cancel(true)
         loadImagesTask = null
     }
 
@@ -63,7 +56,7 @@ class ImagePickerPresenter(private val configuration: Configuration) : BasePrese
     }
 
     fun onDoneSelectImages() {
-        if (selectedImages != null && selectedImages.size > 0) {
+        if (selectedImages.isNotEmpty()) {
             var i = 0
             while (i < selectedImages.size) {
                 val image = selectedImages[i]
@@ -88,7 +81,7 @@ class ImagePickerPresenter(private val configuration: Configuration) : BasePrese
         activity.startActivityForResult(intent, requestCode)
     }
 
-    fun finishCaptureImage(context: Context, data: Intent) {
+    fun finishCaptureImage(context: Context, data: Intent?) {
         cameraModule.getImage(context, data, imageReadyListener = object : OnImageReadyListener {
             override fun onImageReady(image: List<Image>) {
                 if (configuration.isReturnAfterFirst) {
@@ -101,11 +94,9 @@ class ImagePickerPresenter(private val configuration: Configuration) : BasePrese
     }
 
     fun updateMenuDoneVisibility(menuDone: MenuItem?) {
-        if (menuDone != null) {
+        menuDone?.let {
             val isDisplayingFolderView = view?.let { true } ?: false
-            if (selectedImages != null) {
-                menuDone.isVisible = !isDisplayingFolderView && !selectedImages.isEmpty()
-            }
+            menuDone.isVisible = !isDisplayingFolderView && !selectedImages.isEmpty()
             if (configuration.mode == SINGLE && configuration.isReturnAfterFirst) {
                 menuDone.isVisible = false
             }
@@ -116,7 +107,7 @@ class ImagePickerPresenter(private val configuration: Configuration) : BasePrese
         val selectedItemPosition = selectedImagePosition(image)
         if (configuration.mode == ImagePicker.MULTIPLE) {
             if (selectedItemPosition == -1) {
-                if (selectedImages!!.size < configuration.limit) {
+                if (selectedImages.size < configuration.limit) {
                     selectedImages.add(image)
                     view?.updateSelectedImage(image)
                     updateTitle()
@@ -124,7 +115,7 @@ class ImagePickerPresenter(private val configuration: Configuration) : BasePrese
                     view?.showErrorExceedLimit()
                 }
             } else {
-                selectedImages!!.removeAt(selectedItemPosition)
+                selectedImages.removeAt(selectedItemPosition)
                 view?.removeImage(image, clickPosition)
                 updateTitle()
             }
@@ -132,7 +123,7 @@ class ImagePickerPresenter(private val configuration: Configuration) : BasePrese
             if (selectedItemPosition != -1) {
                 view?.removeImage(image, clickPosition)
             } else {
-                selectedImages!!.clear()
+                selectedImages.clear()
                 view?.removeAllImages()
                 selectedImages.add(image)
                 view?.updateSelectedImage(image)
@@ -148,19 +139,15 @@ class ImagePickerPresenter(private val configuration: Configuration) : BasePrese
 
     private fun updateTitle() {
         configuration.defaultToolbarTitle?.let {
-            if (selectedImages != null) {
-                view?.updateTitle(it, configuration.mode, selectedImages.size, configuration.limit)
-            }
+            view?.updateTitle(it, configuration.mode, selectedImages.size, configuration.limit)
         }
     }
 
     private fun selectedImagePosition(image: Image): Int {
-        if (selectedImages != null) {
-            selectedImages.indices
-                    .asSequence()
-                    .filter { selectedImages[it].path == image.path }
-                    .forEach { return it }
-        }
+        selectedImages.indices
+                .asSequence()
+                .filter { selectedImages[it].path == image.path }
+                .forEach { return it }
         return -1
     }
 

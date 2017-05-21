@@ -26,7 +26,7 @@ class DefaultCameraModule : CameraModule, Serializable {
 
     override fun getCameraIntent(context: Context, config: Configuration): Intent? {
         val intent = Intent(MediaStore.ACTION_IMAGE_CAPTURE)
-        val imageFile = ImagePickerUtils.createImageFile(config.capturedImageDirectory!!)
+        val imageFile = config.capturedImageDirectory?.let { ImagePickerUtils.createImageFile(config.capturedImageDirectory as String) }
         if (imageFile != null) {
             val appContext = context.applicationContext
             val providerName = String.format(Locale.ENGLISH, "%s%s", appContext.packageName, ".imagepicker.provider")
@@ -41,28 +41,27 @@ class DefaultCameraModule : CameraModule, Serializable {
         return null
     }
 
-    override fun getImage(context: Context, intent: Intent, imageReadyListener: OnImageReadyListener?) {
+    override fun getImage(context: Context, intent: Intent?, imageReadyListener: OnImageReadyListener?) {
         if (imageReadyListener == null) {
             throw IllegalStateException("OnImageReadyListener must not be null")
         }
 
         if (currentImagePath == null) {
-            imageReadyListener.onImageReady(null!!)
+            imageReadyListener.onImageReady(emptyList())
             return
         }
 
         val imageUri = Uri.parse(currentImagePath)
         if (imageUri != null) {
-            MediaScannerConnection.scanFile(context.applicationContext,
-                    arrayOf(imageUri.path), null
-            ) { path, uri ->
-                var path = path
-                Log.v("ImagePicker", "File $path was scanned successfully: $uri")
+            MediaScannerConnection.scanFile(context.applicationContext, arrayOf(imageUri.path), null)
+            { path, uri ->
+                var pathClone = path
+                Log.v("ImagePicker", "File $pathClone was scanned successfully: $uri")
 
-                if (path == null) {
-                    path = currentImagePath
+                if (pathClone == null) {
+                    pathClone = currentImagePath
                 }
-                imageReadyListener.onImageReady(ImageFactory.singleListFromPath(path!!))
+                imageReadyListener.onImageReady(ImageFactory.singleListFromPath(pathClone))
                 ImagePickerUtils.revokeAppPermission(context, imageUri)
             }
         }

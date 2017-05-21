@@ -24,11 +24,10 @@ class LoadImagesTask(context: Context, internal var listener: ImageLoaderListene
 
     override fun doInBackground(vararg params: Void): List<Folder>? {
         val context = contextWeakReference.get() ?: return null
-
         val cursor = context.contentResolver.query(MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
                 projection, null, null, MediaStore.Images.Media.DATE_ADDED) ?: return null
-
         val folderMap = HashMap<String, Folder>()
+
         if (cursor.moveToLast()) {
             do {
                 val id = cursor.getLong(cursor.getColumnIndex(projection[0]))
@@ -57,9 +56,7 @@ class LoadImagesTask(context: Context, internal var listener: ImageLoaderListene
 
 
     override fun onPostExecute(folders: List<Folder>) {
-        if (listener != null) {
-            listener!!.onImageLoaded(folders)
-        }
+        listener?.onImageLoaded(folders)
     }
 
 }

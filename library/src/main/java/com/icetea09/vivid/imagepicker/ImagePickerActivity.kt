@@ -77,7 +77,7 @@ class ImagePickerActivity : AppCompatActivity() {
         tvEmptyImages = findViewById(R.id.tv_empty_images) as TextView
 
         presenter = ImagePickerPresenter(config)
-        presenter!!.attachView(this)
+        (presenter as ImagePickerPresenter).attachView(this)
         orientationBasedUI(resources.configuration.orientation)
     }
 
@@ -85,10 +85,10 @@ class ImagePickerActivity : AppCompatActivity() {
         super.onStart()
         observer = object : ContentObserver(Handler()) {
             override fun onChange(selfChange: Boolean) {
-                presenter!!.loadImages()
+                presenter?.loadImages()
             }
         }
-        contentResolver.registerContentObserver(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, false, observer!!)
+        contentResolver.registerContentObserver(MediaStore.Images.Media.EXTERNAL_CONTENT_URI, false, observer)
     }
 
     override fun onResume() {
@@ -98,13 +98,11 @@ class ImagePickerActivity : AppCompatActivity() {
 
     override fun onDestroy() {
         super.onDestroy()
-        if (presenter != null) {
-            presenter!!.abortLoad()
-            presenter!!.detachView()
-        }
+        presenter?.abortLoad()
+        presenter?.detachView()
 
         if (observer != null) {
-            contentResolver.unregisterContentObserver(observer!!)
+            contentResolver.unregisterContentObserver(observer)
             observer = null
         }
     }
@@ -119,7 +117,7 @@ class ImagePickerActivity : AppCompatActivity() {
 
     override fun onPrepareOptionsMenu(menu: Menu): Boolean {
         val menuDone = menu.findItem(R.id.menu_done)
-        presenter!!.updateMenuDoneVisibility(menuDone)
+        presenter?.updateMenuDoneVisibility(menuDone)
         return super.onPrepareOptionsMenu(menu)
     }
 
@@ -131,7 +129,7 @@ class ImagePickerActivity : AppCompatActivity() {
         if (id == android.R.id.home) {
             onBackPressed()
         } else if (id == R.id.menu_done) {
-            presenter!!.onDoneSelectImages()
+            presenter?.onDoneSelectImages()
         }
         return super.onOptionsItemSelected(item)
     }
@@ -150,14 +148,14 @@ class ImagePickerActivity : AppCompatActivity() {
     override fun onRequestPermissionsResult(requestCode: Int, permissions: Array<String>, grantResults: IntArray) {
         when (requestCode) {
             RC_PERMISSION_WRITE_EXTERNAL_STORAGE -> {
-                if (grantResults.size != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    presenter!!.loadImages()
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                    presenter?.loadImages()
                     return
                 }
                 finish()
             }
             RC_PERMISSION_CAMERA -> {
-                if (grantResults.size != 0 && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                if (grantResults.isNotEmpty() && grantResults[0] == PackageManager.PERMISSION_GRANTED) {
                     captureImage()
                     return
                 }
@@ -168,10 +166,10 @@ class ImagePickerActivity : AppCompatActivity() {
         }
     }
 
-    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent) {
+    override fun onActivityResult(requestCode: Int, resultCode: Int, data: Intent?) {
         super.onActivityResult(requestCode, resultCode, data)
         if (requestCode == RC_CAPTURE && resultCode == Activity.RESULT_OK) {
-            presenter!!.finishCaptureImage(this, data)
+            presenter?.finishCaptureImage(this, data)
         }
     }
 
@@ -200,8 +198,8 @@ class ImagePickerActivity : AppCompatActivity() {
 
         imageAdapter = ImagePickerAdapter(this, itemClickListener = object : OnImageClickListener {
             override fun onImageClick(view: View, position: Int) {
-                val image = imageAdapter!!.getItem(position)
-                presenter!!.handleImageClick(position, image)
+                val image = imageAdapter?.getItem(position)
+                image?.let { presenter?.handleImageClick(position, image) }
             }
         })
 
@@ -264,7 +262,7 @@ class ImagePickerActivity : AppCompatActivity() {
     }
 
     fun updateSelectedImage(image: Image) {
-        imageAdapter!!.addSelected(image)
+        imageAdapter?.addSelected(image)
     }
 
     fun showErrorExceedLimit() {
@@ -272,28 +270,28 @@ class ImagePickerActivity : AppCompatActivity() {
     }
 
     fun removeImage(image: Image, clickPosition: Int) {
-        imageAdapter!!.removeSelectedPosition(image, clickPosition)
+        imageAdapter?.removeSelectedPosition(image, clickPosition)
     }
 
     fun removeAllImages() {
-        imageAdapter!!.removeAllSelectedSingleClick()
+        imageAdapter?.removeAllSelectedSingleClick()
     }
 
     private fun setUpImageAdapter(images: List<Image>) {
-        imageAdapter!!.setData(images)
+        imageAdapter?.setData(images)
         setItemDecoration(imageColumns)
         recyclerView?.adapter = imageAdapter
     }
 
     private fun setUpFolderAdapter(folders: List<Folder>?) {
         if (folders != null) {
-            folderAdapter!!.setData(folders)
+            folderAdapter?.setData(folders)
         }
         setItemDecoration(folderColumns)
         recyclerView?.adapter = folderAdapter
 
         if (foldersState != null) {
-            layoutManager!!.spanCount = folderColumns
+            layoutManager?.spanCount = folderColumns
             recyclerView?.layoutManager?.onRestoreInstanceState(foldersState)
         }
     }
@@ -316,7 +314,7 @@ class ImagePickerActivity : AppCompatActivity() {
      * Set item decoration
      */
     private fun setItemDecoration(columns: Int) {
-        layoutManager!!.spanCount = columns
+        layoutManager?.spanCount = columns
         if (itemOffsetDecoration != null)
             recyclerView?.removeItemDecoration(itemOffsetDecoration)
         itemOffsetDecoration = GridSpacingItemDecoration(columns, resources.getDimensionPixelSize(R.dimen.item_padding), false)
@@ -329,7 +327,7 @@ class ImagePickerActivity : AppCompatActivity() {
     private fun getDataWithPermission() {
         val rc = ActivityCompat.checkSelfPermission(this, Manifest.permission.WRITE_EXTERNAL_STORAGE)
         if (rc == PackageManager.PERMISSION_GRANTED) {
-            presenter!!.loadImages()
+            presenter?.loadImages()
         } else {
             ActivityCompat.requestPermissions(this, arrayOf(Manifest.permission.WRITE_EXTERNAL_STORAGE),
                     RC_PERMISSION_WRITE_EXTERNAL_STORAGE)
@@ -361,7 +359,7 @@ class ImagePickerActivity : AppCompatActivity() {
         if (!CameraHelper.checkCameraAvailability(this)) {
             return
         }
-        presenter!!.captureImage(this, RC_CAPTURE)
+        presenter?.captureImage(this, RC_CAPTURE)
     }
 
     companion object {
