@@ -226,7 +226,7 @@ class ImagePickerActivity : AppCompatActivity() {
     /**
      * Check if displaying folders view
      */
-    val isDisplayingFolderView: Boolean
+    private val isDisplayingFolderView: Boolean
         get() = recyclerView?.adapter == null || recyclerView?.adapter is FolderPickerAdapter
 
     fun finishPickImages(images: List<Image>) {

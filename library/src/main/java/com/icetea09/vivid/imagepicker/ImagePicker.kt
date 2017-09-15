@@ -3,14 +3,8 @@ package com.icetea09.vivid.imagepicker
 import android.app.Activity
 import android.content.Context
 import android.content.Intent
-import android.support.annotation.IntDef
 import android.support.v4.app.Fragment
-
 import com.icetea09.vivid.model.Image
-
-import java.lang.annotation.Retention
-
-import java.lang.annotation.RetentionPolicy.SOURCE
 
 abstract class ImagePicker {
 
@@ -83,8 +77,8 @@ abstract class ImagePicker {
         return this
     }
 
-    companion object {
 
+    companion object {
         val EXTRA_SELECTED_IMAGES = "selectedImages"
         val EXTRA_LIMIT = "limit"
         val EXTRA_SHOW_CAMERA = "showCamera"
@@ -95,18 +89,24 @@ abstract class ImagePicker {
         val EXTRA_IMAGE_DIRECTORY = "capturedImageDirectory"
         val EXTRA_RETURN_AFTER_FIRST = "returnAfterFirst"
 
+        @JvmField
         val SINGLE = 1
+        @JvmField
         val MULTIPLE = 2
+        @JvmField
         val MAX_LIMIT = 99
 
+        @JvmStatic
         fun create(activity: Activity): ImagePickerWithActivity {
             return ImagePickerWithActivity(activity)
         }
 
+        @JvmStatic
         fun create(fragment: Fragment): ImagePickerWithFragment {
             return ImagePickerWithFragment(fragment)
         }
 
+        @JvmStatic
         fun getImages(intent: Intent?): List<Image>? {
             if (intent == null) {
                 return null

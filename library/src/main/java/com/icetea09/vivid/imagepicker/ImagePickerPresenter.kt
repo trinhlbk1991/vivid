@@ -95,8 +95,7 @@ class ImagePickerPresenter(private val configuration: Configuration) : BasePrese
 
     fun updateMenuDoneVisibility(menuDone: MenuItem?) {
         menuDone?.let {
-            val isDisplayingFolderView = view?.let { true } ?: false
-            menuDone.isVisible = !isDisplayingFolderView && !selectedImages.isEmpty()
+            menuDone.isVisible = !selectedImages.isEmpty()
             if (configuration.mode == SINGLE && configuration.isReturnAfterFirst) {
                 menuDone.isVisible = false
             }

@@ -11,7 +11,6 @@
     <ScrollView
         android:layout_width="match_parent"
         android:layout_height="match_parent"
-        android:layout_above="@+id/ef_bottom_container"
         android:fillViewport="true">
 
         <LinearLayout
@@ -20,74 +19,37 @@
             android:orientation="vertical">
 
             <Switch
-                android:id="@+id/ef_switch_return_after_capture"
+                android:id="@+id/switch_mode_single"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/activity_vertical_margin"
-                android:text="Return After First   " />
+                android:text="Mode Single" />
 
             <Switch
-                android:id="@+id/ef_switch_single"
+                android:id="@+id/switch_return_after_first"
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:layout_marginBottom="@dimen/activity_vertical_margin"
-                android:text="Single Mode?   " />
+                android:text="Return After First" />
+
+            <EditText
+                android:id="@+id/et_limit_images"
+                android:layout_width="match_parent"
+                android:layout_height="wrap_content"
+                android:text="9"
+                android:hint="Enter number of limit images" />
+
+            <Button
+                android:id="@+id/btn_launch_vivid"
+                android:layout_width="wrap_content"
+                android:layout_height="wrap_content"
+                android:text="Launch Vivid Image Picker" />
 
             <TextView
-                android:id="@+id/text_view"
-                android:layout_width="wrap_content"
+                android:id="@+id/tv_selected_images"
+                android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:text="Hello, world!" />
 
         </LinearLayout>
     </ScrollView>
-
-
-    <LinearLayout
-        android:id="@+id/ef_bottom_container"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_alignParentBottom="true"
-        android:layout_centerHorizontal="true"
-        android:gravity="center"
-        android:orientation="vertical">
-
-        <LinearLayout
-            android:layout_width="match_parent"
-            android:layout_height="wrap_content"
-            android:gravity="center"
-            android:orientation="horizontal">
-
-            <Button
-                android:id="@+id/button_pick_image"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="PICK IMAGE" />
-
-            <Button
-                android:id="@+id/button_pick_image_intent"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:text="PICK IMAGE INTENT" />
-
-        </LinearLayout>
-
-        <Button
-            android:id="@+id/button_launch_fragment"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="Launch Fragment" />
-
-        <Button
-            android:id="@+id/button_camera"
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:text="CAMERA ONLY" />
-    </LinearLayout>
-
-    <FrameLayout
-        android:id="@+id/fragment_container"
-        android:layout_width="match_parent"
-        android:layout_height="match_parent" />
 
 </RelativeLayout>
