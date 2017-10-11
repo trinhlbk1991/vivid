@@ -8,12 +8,10 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.FrameLayout
 import android.widget.ImageView
-
-import com.bumptech.glide.Glide
+import com.icetea09.vivid.GlideApp
 import com.icetea09.vivid.R
 import com.icetea09.vivid.model.Image
-
-import java.util.ArrayList
+import java.util.*
 
 class ImagePickerAdapter(private val context: Context, private val itemClickListener: ImagePickerAdapter.OnImageClickListener) : RecyclerView.Adapter<ImagePickerAdapter.ImageViewHolder>() {
 
@@ -27,7 +25,7 @@ class ImagePickerAdapter(private val context: Context, private val itemClickList
 
     override fun onBindViewHolder(viewHolder: ImageViewHolder, position: Int) {
         val image = images[position]
-        Glide.with(context)
+        GlideApp.with(context)
                 .load(image.path)
                 .placeholder(R.drawable.image_placeholder)
                 .error(R.drawable.image_placeholder)
@@ -74,7 +72,7 @@ class ImagePickerAdapter(private val context: Context, private val itemClickList
     class ImageViewHolder(itemView: View, private val itemClickListener: OnImageClickListener)
         : RecyclerView.ViewHolder(itemView), View.OnClickListener {
 
-        internal val imageView: ImageView = itemView.findViewById(R.id.image_view) as ImageView
+        internal val imageView: ImageView = itemView.findViewById(R.id.image_view)
         internal val alphaView: View = itemView.findViewById(R.id.view_alpha)
 
         init {

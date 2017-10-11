@@ -7,8 +7,7 @@ import android.view.View
 import android.view.ViewGroup
 import android.widget.ImageView
 import android.widget.TextView
-
-import com.bumptech.glide.Glide
+import com.icetea09.vivid.GlideApp
 import com.icetea09.vivid.R
 import com.icetea09.vivid.model.Folder
 
@@ -25,9 +24,8 @@ class FolderPickerAdapter(private val context: Context, private val folderClickL
 
     override fun onBindViewHolder(holder: FolderViewHolder, position: Int) {
         val folder = folders?.get(position)
-
         folder?.let {
-            Glide.with(context)
+            GlideApp.with(context)
                     .load(folder.images[0].path)
                     .placeholder(R.drawable.folder_placeholder)
                     .error(R.drawable.folder_placeholder)
@@ -52,9 +50,9 @@ class FolderPickerAdapter(private val context: Context, private val folderClickL
     }
 
     class FolderViewHolder(itemView: View) : RecyclerView.ViewHolder(itemView) {
-        internal val image: ImageView = itemView.findViewById(R.id.image) as ImageView
-        internal val name: TextView = itemView.findViewById(R.id.tv_name) as TextView
-        internal val number: TextView = itemView.findViewById(R.id.tv_number) as TextView
+        internal val image: ImageView = itemView.findViewById(R.id.image)
+        internal val name: TextView = itemView.findViewById(R.id.tv_name)
+        internal val number: TextView = itemView.findViewById(R.id.tv_number)
 
     }
 

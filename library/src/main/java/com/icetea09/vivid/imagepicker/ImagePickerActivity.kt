@@ -70,11 +70,11 @@ class ImagePickerActivity : AppCompatActivity() {
         setTheme(config.theme)
         super.onCreate(savedInstanceState)
         setContentView(R.layout.activity_image_picker)
-        toolbar = findViewById(R.id.toolbar) as Toolbar
-        recyclerView = findViewById(R.id.recyclerView) as RecyclerView
-        fabCamera = findViewById(R.id.fab_camera) as FloatingActionButton
-        progressBar = findViewById(R.id.progress_bar) as ProgressBar
-        tvEmptyImages = findViewById(R.id.tv_empty_images) as TextView
+        toolbar = findViewById(R.id.toolbar)
+        recyclerView = findViewById(R.id.recyclerView)
+        fabCamera = findViewById(R.id.fab_camera)
+        progressBar = findViewById(R.id.progress_bar)
+        tvEmptyImages = findViewById(R.id.tv_empty_images)
 
         presenter = ImagePickerPresenter(config)
         (presenter as ImagePickerPresenter).attachView(this)
